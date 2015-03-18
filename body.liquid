@@ -1,0 +1,2817 @@
+<!-- THEME OPTIONS -->
+{% assign MyCasesSort = false %} <!-- All cases load on my case index page and our sortable -->
+{% assign IndexLayout = "Grid" %} <!-- Layout Functionality: Topics, Grid, List -->
+{% assign SkipPreCreate = false %} <!-- Enable skip precreate site wide (email,chat, question) -->
+
+<!-- MULTIBRAND OPTIONS -->
+{% assign MBSearchPage = false %} <!--Enables multibrand search page - all results/brands on one page -->
+{% assign MBSearchExcludeQuestions = false %} <!-- exclude questions, should only enable if MBSearchPage = true -->
+{% assign MBSearchSuggest = false %} <!-- Multibrand search autocomplete similar to desk's support site -->
+{% assign MBArticleSuggest = false %} <!-- Multibrand Article suggestion on email/chat/question forms -->
+
+
+<!-- LOGO WIDTH TESTING // DONT REMOVE-->
+{% if desk.page.theme.logo-img != "" %}
+  {% assign logowidth = desk.page.theme.logo-img-width | plus: 0 %}
+  {% if logowidth > 300 %}
+    {% assign widelogo = true %}
+  {% else %}
+   {% assign widelogo = false %}
+  {% endif %}
+{% endif %}
+
+
+{% capture sidebar_main %}
+    <!-- BEGIN MAIN SIDEBAR -->
+      <div id="sidebar" class="col-md-4 {% if desk.page.theme.layout != 'left' %}left col-md-pull-8{% endif %}">
+        {% if site.questions_enabled_config or desk.apps.get_satisfaction.enabled or  site.email_enabled_config or site.chat_enabled_config or site.phone_enabled_config %}
+          <h2>
+            {{system.snippets.contact_us}}
+          </h2>
+          <ul>
+            {% if site.questions_enabled_config %}
+            <li>
+              <a href='{{desk.system.links.question}}'>{{system.snippets.post_public_question}}<i class="fa fa-angle-right"></i></a>
+            </li>
+            {% endif %}
+
+            <!-- GS -->
+            {% if desk.apps.get_satisfaction.enabled %}
+            <li>
+              <a id='gs_link' target='_blank'>{{system.snippets.ask_community}}<i class="fa fa-angle-right"></i></a>
+            </li>
+            {% endif %}
+            <!-- GS -->
+
+            {% if site.email_enabled_config %}
+            <li>
+              <a href='{{desk.system.links.email}}'>{{system.snippets.email_us}}<i class="fa fa-angle-right"></i></a>
+            </li>
+            {% endif %}
+            {% if site.chat_enabled_config %}
+            <li>
+              <a href='{{desk.system.links.chat}}'>{{system.snippets.live_chat}}<i class="fa fa-angle-right"></i></a>
+            </li>
+            {% endif %}
+            {% if site.phone_enabled_config %}
+            <li class="phone">
+              <a>{{ desk.page.theme.contact_us_content }}</a>
+            </li>
+            {% endif %}
+          </ul>
+        {% endif %}
+      </div>
+    <!-- END MAIN SIDEBAR -->
+{% endcapture %}
+
+{% capture sidebar_suggest %}
+    <!-- BEGIN AUTO SUGGEST SIDEBAR -->
+    <div id="sidebar" class="sidebar suggest col-md-4 {% if desk.page.theme.layout != 'left' %}left col-md-pull-8 {% endif %}">
+      <div id="common">
+        {% if page == "question_new" %}
+          <h2>{{ system.snippets.related_questions }}</h2>
+        {% else %}
+          <h2>{{ system.snippets.related_answers }}</h2>
+        {% endif %}
+          <h4>{{ system.snippets.start_typing }}</h4>
+      </div>
+      {% if MBArticleSuggest == true %}
+        <div class="autosuggest multi-brand"></div>
+      {% else %}
+        <div class="autosuggest"></div>
+      {% endif %}
+    </div>
+    <!-- END AUTO SUGGEST SIDEBAR -->
+{% endcapture %}
+
+<div id="site-wrapper" class="wrapper">
+  <div id="site-canvas" class="content {{ desk.current_brand.name }}">
+    <!--MOBILE SLIDEOUT MENU -->
+    <div id="mobile-menu">
+      <div class="search">
+        <div class="row">
+          <div class="col-md-12">
+            <form action="/customer/portal/articles/search" method="get" id="support-search-ornot" class="support-search-small-ornot">
+                {{template_form_params}}
+                <input id="q2" maxlength="100" name="q" type="text" value="" class="ui-autocomplete-input-ornot form-control" autocomplete="on">
+                <button type="submit" class="fa fa-search" id="support-search-submit" value="{{system.snippets.search}}"></button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-suggest">
+      </div>
+      <div class="brand">
+        <div class="logo">
+            {% if desk.current_brand.name == nil %}
+              {{ site.company_name }}
+            {% else %}
+               {{ desk.current_brand.name }}
+            {% endif %}
+        </div>
+        <h1>
+          {% if desk.current_brand.name == nil %}
+            {{ site.company_name }}
+          {% else %}
+             {{ desk.current_brand.name }}
+          {% endif %}
+        </h1>
+          {% if current_user and current_user.is_guest == false %}
+                <h4 class="welcome">{{system.snippets.welcome}} <a href="{{ desk.system.links.myaccount }}"> {{ current_user.customer.name }}</a></h4>
+                <a href="{{ desk.system.links.myaccount }}">{{ current_user.customer.email | gravatar_image: gravatar_unknown_user, ssl }}</a>
+                <h5>{{ current_user.customer.email }}</h5>
+          {% endif %}
+      </div>
+      <ul class="nav nav-pills nav-stacked">
+          {% if site.questions_enabled_config %}
+            <li>
+              <a href='{{desk.system.links.question}}'>{{system.snippets.post_public_question}}<i class="fa fa-question"></i></a>
+            </li>
+          {% endif %}
+
+          {% if site.email_enabled_config %}
+            <li>
+              <a href='{{desk.system.links.email}}'>{{system.snippets.email_us}}<i class="fa fa-envelope"></i></a>
+            </li>
+          {% endif %}
+          {% if site.chat_enabled_config %}
+            <li>
+              <a href='{{desk.system.links.chat}}'>{{system.snippets.live_chat}}<i class="fa fa-comments"></i></a>
+            </li>
+          {% endif %}
+          {% if site.phone_enabled_config %}
+            <li class="phone">
+              <a>{{ desk.page.theme.contact_us_content }}</a>
+            </li>
+          {% endif %}
+          {% if site.portal_authentication_enabled_config %}
+            <!-- Guest -->
+            {% if current_user and current_user.is_guest == true  and page != "login" %}
+              <li>
+                <!--<span class="desk-guestMessage">{{system.snippets.welcome_guest}}</span>-->
+                <a href="{{ site.authentication_login_url }}" id="desk-auth-login-link" class="">{{system.snippets.login}}<i class="fa fa-sign-in"></i></a>
+              </li>
+              {% if langs_list %}
+                <li id="desk-mobile-lang-list"></li>
+              {% endif %}
+          {% else %}
+          <!-- Logged In -->
+              {% if site.myportal_enabled %}
+                <li>
+                  <a href="{{ desk.system.links.myportal }}">{{system.snippets.my_cases}} <i class="fa fa-inbox"></i></a>
+                </li>
+              {% endif %}
+
+              {% if site.portal_authentication_type_config == 'desk' %}
+                <li>
+                  <a href="{{ desk.system.links.myaccount }}" id="desk-myaccount-link">{{system.snippets.my_account}} <i class="fa fa-user"></i></a>
+                </li>
+              {% endif %}
+
+              {% if site.portal_logout_enabled_config %}
+                <li>
+                  <a href="{{ site.authentication_logout_url }}" id="desk-logout-link">{{system.snippets.logout}} <i class="fa fa-sign-out"></i></a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+      </ul>
+    </div>
+    <!--MOBILE HEADER/TOPBAR -->
+    <div id="mobileHeader">
+      <div class="row">
+        <div class="col-xs-2">
+          <a id="MobileToggle" class="menu-button">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </a>
+        </div>
+        <div class="col-xs-8">
+          <h1>
+            <a class="brand" href="#">
+              {% if desk.current_brand.name == nil %}
+                {{ site.company_name }}
+              {% else %}
+                 {{ desk.current_brand.name }}
+              {% endif %}
+            </a>
+          </h1>
+        </div>
+        <div class="col-xs-2">
+            <!-- {{ current_user.customer.email | gravatar_image: gravatar_unknown_user, ssl }} -->
+        </div>
+      </div>
+    </div>
+    <!-- DESKTOP HEADER -->
+    <div id="header">
+      <div class="container">
+
+        <div class="{% if widelogo == true %} col-md-12 {% else %} col-md-5 {% endif %}">
+            {% if desk.page.theme.header_content == "" %}
+            <h1>
+              <a href='/'>
+                {% if desk.current_brand.name == nil %}
+                  {{ site.company_name }}
+                {% else %}
+                   {{ desk.current_brand.name }}
+                {% endif %}
+              </a>
+            </h1>
+            {% else %}
+              {{ desk.page.theme.header_content }}
+            {% endif %}
+        </div>
+        <div class="{% if widelogo == true %} col-md-12 {% else %} col-md-7 {% endif %}">
+          <ul class="nav nav-pills">
+            {% if current_user and current_user.is_guest == true %}
+             {% if langs_list %}
+               <li>
+                    {{langs_list}}
+               </li>
+             {% endif %}
+            {% endif %}
+            {% if site.portal_authentication_enabled_config %}
+              <!-- Guest -->
+              {% if current_user and current_user.is_guest == true  and page != "login" %}
+                <li>
+                  <a href="{{ site.authentication_login_url }}" id="desk-auth-login-link" class="">{{system.snippets.login}}</a>
+                </li>
+              {% endif %}
+              <!-- Logged In -->
+              {% if current_user and current_user.is_guest == false %}
+                <li class="desk-guestMessage"><p>{{system.snippets.welcome}} {{ current_user.customer.name }}</p></li>
+
+                {% if site.myportal_enabled %}
+                  <li>
+                    <a href="{{ desk.system.links.myportal }}">{{system.snippets.my_cases}} </a>
+                  </li>
+                {% endif %}
+                {% if site.portal_authentication_type_config == 'desk' %}
+                  <li>
+                    <a href="{{ desk.system.links.myaccount }}" id="desk-myaccount-link">{{system.snippets.my_account}}</a>
+                  </li>
+                {% endif %}
+                {% if site.portal_logout_enabled_config %}
+                  <li>
+                    <a href="{{ site.authentication_logout_url }}" id="desk-logout-link">{{system.snippets.logout}}</a>
+                  </li>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          </ul>
+        </div>
+      </div><!-- Container Desktop -->
+    </div><!-- #desk-header -->
+
+    <!-- SEARCH -->
+    {% if page == "myportal_index" or page == "myaccount" or page == "login" or page == "registration" or page == "authentication_verification" or page == "forgot_password" or page == "authentication_verification" %} {% else %}
+        <div id="search" class="hidden-phone">
+          <div class="container">
+            <div class="row">
+              {{ search_form_begin }}
+              <div class="col-md-12">
+                {{template_form_params}}
+                {% if MBSearchSuggest == true %}
+                  <input type="text" id="qMB" name="q" maxlength="100" value="" placeholder="{{system.snippets.have_a_question}}" class="input form-control" autocomplete="off" />
+                {% else %}
+                  <input type="text" id="q" name="q" maxlength="100" value="" placeholder="{{system.snippets.have_a_question}}" class="input form-control" />
+                {% endif %}
+                  <button type="submit" class="fa fa-search" id="support-search-submit" value="{{system.snippets.search}}"></button>
+              </div>
+              {{ search_form_end }}
+            </div>
+          </div><!-- Search Container -->
+        </div><!-- #desk-search -->
+        <div id="SearchAutoSuggest" class="ui-multi-brand"></div>
+    {% endif %}
+    <!-- END SEARCH -->
+    <!-- BREADCRUMBS -->
+    {% if page  != "page_index" %}
+        <div id="breadcrumbs">
+          <div class="container">
+            <div class="row">
+                <ol class="breadcrumb">
+                  {% if page  == "page_index" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a></li>
+                  {% elsif page == "page_article" %}
+                    {% if article %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb"><a href="{{ topic.public_articles_url }}" title="{{ topic.name }}">{{ topic.name }}</a> </li>
+                      <li class="active crumb" title="{{ article.subject_plain }}">{{ article.subject_plain }}</li>
+                    {% else %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb active">{{system.snippets.article_translation_missing}}</li>
+                    {% endif %}
+                  {% elsif page == "page_topic" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      {% if topic %}
+                      <li class="crumb active">{{ topic.name }}</li>
+                      {% endif %}
+                  {% elsif page == "page_search_result" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb">{{system.snippets.search}} </li>
+                      <li class="active crumb" title="{{ search_term }}">{{ search_term }}</li>
+                  {% elsif page == "question_show" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb"><a href="{{ question.topic.public_questions_url }}" title="{{ question.topic.name }}">{{ question.topic.name  | clip:30 }}</a> </li>
+                      <li class="active crumb" title="{{ question.subject }}">{{ question.subject | clip:30 }}</li>
+                  {% elsif page == "question_new" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb" title="{{ article.subject_plain }}">{{system.snippets.post_public_question}}</li>
+                  {% elsif page == "question_pre_create" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb"><a href='{{desk.system.links.question}}'>{{system.snippets.post_public_question}}</a> </li>
+                      <li class="active crumb">{{system.snippets.post_public_question}}</li>
+                  {% elsif page == "email_new" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb" title="{{ article.subject_plain }}">{{system.snippets.email_us}}</li>
+                  {% elsif page == "email_pre_create" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> &rsaquo; {{system.snippets.email_us}}</li>
+                  {% elsif page == "email_submitted" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb">{{system.snippets.email_us}}</li>
+                  {% elsif page == "chat_new" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb" title="{{system.snippets.live_chat}}">{{system.snippets.live_chat}}</li>
+                  {% elsif page == "chat_pre_create" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb">{{system.snippets.live_chat}}</li>
+                  {% elsif page == "myportal_index" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb">{{desk.system.snippets.my_cases}}</li>
+                  {% elsif page == "myportal_show" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      {% if desk.customer.can_access_company_tickets? %}
+                      <li class="crumb"><a href='{{ desk.system.links.myportal }}'>{{ desk.page.content.case.customer.name }}</a></li>
+                      {% endif %}
+                      <li class="crumb"><a href='{{ desk.system.links.myportal }}'>{{desk.system.snippets.my_cases}}</a> </li>
+                      <li class="active crumb">{{desk.page.content.case.subject | clip:30 }}</li>
+                  {% elsif page == "login" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb active">{{desk.system.snippets.login_title}}</li>
+                  {% elsif page == "registration" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb"><a href='{{ site.authentication_login_url }}'>{{desk.system.snippets.login_title}}</a> </li>
+                      <li class="crumb active">{{desk.system.snippets.registration_title}}</li>
+                  {% elsif page == "forgot_password" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="crumb"><a href='{{desk.system.links.login}}'>{{desk.system.snippets.login_title}}</a> </li>
+                      <li class="crumb active">{{desk.system.snippets.password_reset_title}}</li>
+                  {% elsif page == "myaccount" %}
+                      <li class="crumb"><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> </li>
+                      <li class="active crumb">{{desk.system.snippets.account_title}}</li>
+                  {% elsif page == "authentication_verification" %}
+                      <li><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> &rsaquo; {{desk.system.snippets.auth_verification_title}}</li>
+                  {% endif %}
+                </ol>
+            </div>
+          </div>
+        </div><!-- #breadcrumbs -->
+    {% endif %}
+    <!-- END BREADCRUMBS -->
+    <!--begin:portal_body-->
+{% if page  == "page_index" %}
+<!--begin:page_index-->
+        <!--
+        `7MMF'`7MN.   `7MF'`7MM"""Yb. `7MM"""YMM  `YMM'   `MP'
+          MM    MMN.    M    MM    `Yb. MM    `7    VMb.  ,P
+          MM    M YMb   M    MM     `Mb MM   d       `MM.M'
+          MM    M  `MN. M    MM      MM MMmmMM         MMb
+          MM    M   `MM.M    MM     ,MP MM   Y  ,    ,M'`Mb.
+          MM    M     YMM    MM    ,dP' MM     ,M   ,P   `MM.
+        .JMML..JML.    YM  .JMMmmmdP' .JMMmmmmMMM .MM:.  .:MMa.
+                      START INDEX PAGE
+                                                            -->
+        <div id="content">
+          <div class="container index">
+            <div class="row">
+            {% if IndexLayout == "Topics" %}
+              <div class="col-md-12 centered">
+            {% else %}
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+            {% endif %}
+                <div id="desk-external-variables-page_index" class="desk-external-variables">
+                  <div id="system-snippets-just_moderated">{{just_moderated}}</div>
+                </div>
+                <div class="row header">
+                  {% if just_moderated %}
+                    <div id="modal-screen">&nbsp;</div>
+                    <div id="modal">
+                      <div class="inner">
+                        <div class="main">
+                          <h1>{{system.snippets.your_post_submitted}}</h1>
+                          <p class='subheader'>
+                            {{system.snippets.not_shown_until_reviewed}}
+                          </p>
+                          <div id='form'>
+                            <div class='input-button'>
+                              <input id='moderation_okay_button'  name='commit' type='submit'  value='{{system.snippets.okay}}' />
+                              <img alt='Ajax-loader-small' id='question_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display: none; margin: 7px 0 0 5px; position: absolute;'/>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                  <h2 class="subheader col-md-12">
+                    {% if topics_count > 0 %}
+                        {{system.snippets.browse_by_topic}}
+                    {% else %}
+                        {{system.snippets.no_topics_avail}}
+                    {% endif %}
+                  </h2>
+                </div>
+                <!-- INDEX PAGE LAYOUT CHANGE FUNCTIONALITY -->
+                {% if IndexLayout == "Grid" %}
+                <!--START GRID VIEW (DEFAULT) -->
+                  <!-- ARTICLES GRID VIEW -->
+                  <div class="row topic">
+                    {% assign col = 0 %}
+                    {%for topic in topics%}
+                      {% if topic.article_count > 0 %}
+                          <div class="desk-topic desk-topic-{{ topic.id }} col-md-6">
+                            <h3>
+                               <a href='{{ topic.public_articles_url }}'>{{ topic.name }}</a></h3>
+                            <ul>
+                              {% for article in topic.articles limit:5 %}
+                              <li>
+                                <a href='{{ article.public_url }}'>{{ article.subject_plain }}</a>
+                              </li>
+                              {% endfor %}
+                            </ul>
+                            <a href='{{ topic.public_articles_url }}' class="btn btn-pill"><span class="desk-view-text">{{system.snippets.view_all}} </span>
+                              {{ topic.article_count }}
+                            </a>
+                          </div>
+
+                          {% if col == 2 %}
+                            </div><div class="row topic">
+                            {%assign col = 0 %}
+                          {%else%}
+                            {% assign col = 2 %}
+                          {%endif%}
+
+                      {%endif%}
+                    {%endfor%}
+                  </div>
+                  <!-- END ARTICLES GRID VIEW -->
+
+                  <!-- QUESTION GRID VIEW -->
+                  {% if site.questions_enabled_config %}
+                    <!-- DO QUESTIONS EXIST?-->
+                    {%for topic in topics %}
+                        {% if topic.question_count > 0 %}
+                            {% assign questions = true %}
+                        {% endif %}
+                    {% endfor %}
+                    <!-- END QUESTIONS EXIST -->
+                    <div class="row header">
+                        <h2 class="subheader col-md-12">
+                          {% if questions == true %}
+                            {{system.snippets.recent_qna}}
+                          {% endif %}
+                        </h2>
+                    </div>
+                    <div class="row topic">
+                      {% assign col = 0 %}
+                        {%for topic in topics%}
+                          {% if topic.question_count > 0 %}
+                            <div class="desk-qna desk-qna-{{ topic.id }} col-md-6">
+                              <h3><a href='{{ topic.public_articles_url }}'>{{ topic.name }}</a></h3>
+                              <ul>
+                                {% for question in topic.questions limit:5 %}
+                                <li class='desk-question {% if question.featured? %} featured{%endif%}'>
+                                  <a href='{{ question.public_url }}'>{{ question.subject_plain }}</a>
+                                </li>
+                                {% endfor %}
+                              </ul>
+
+                              <a href='{{ topic.public_questions_url  }}' class="btn btn-pill"><span class="desk-view-text">{{system.snippets.view_all}} </span>
+                                {{ topic.question_count }}
+                              </a>
+                            </div>
+                            {% if col == 2 %}
+                              </div><div class="row topic">
+                              {%assign col = 0 %}
+                            {%else%}
+                              {% assign col = 2 %}
+                            {%endif%}
+                          {% endif %}
+                        {% endfor %}
+                      </div><!-- .topicContainer.row -->
+                  {% endif %}
+                <!-- END GRID VIEW -->
+                {% elsif IndexLayout == "Topics" %}
+                <!--START TOPICS ONLY VIEW -->
+                  <div class="row topics-only">
+                    {% assign col = 0 %}
+                    {%for topic in topics%}
+                      {% if topic.article_count > 0 %}
+                          <div class="desk-topic desk-topic-{{ topic.id }} col-md-6">
+                               <a href='{{ topic.public_articles_url }}' class="btn btn-primary">{{ topic.name }} <span>{{ topic.article_count }}</span></a>
+                          </div>
+                          {% if col == 2 %}
+                            </div><div class="row topics-only">
+                            {%assign col = 0 %}
+                          {%else%}
+                            {% assign col = 2 %}
+                          {%endif%}
+                      {%endif%}
+                    {%endfor%}
+                  </div>
+                <!--END TOPICS ONLY VIEW -->
+                {% endif %}
+              </div><!--Index Col 8 -->
+              <!--SIDEBAR -->
+                {% if IndexLayout != "Topics" %}
+                  {{ sidebar_main }}
+                {% endif %}
+              <!--SIDEBAR -->
+            </div><!-- Main Row-->
+          </div><!--Container-->
+        </div><!--Content-->
+<!--end:page_index-->
+{% elsif page == "page_article" %}
+<!--begin:page_article-->
+        <!--
+              db      `7MM"""Mq. MMP""MM""YMM `7MMF' .g8"""bgd `7MMF'      `7MM"""YMM
+             ;MM:       MM   `MM.P'   MM   `7   MM .dP'     `M   MM          MM    `7
+            ,V^MM.      MM   ,M9      MM        MM dM'       `   MM          MM   d
+           ,M  `MM      MMmmdM9       MM        MM MM            MM          MMmmMM
+           AbmmmqMA     MM  YM.       MM        MM MM.           MM      ,   MM   Y  ,
+          A'     VML    MM   `Mb.     MM        MM `Mb.     ,'   MM     ,M   MM     ,M
+        .AMA.   .AMMA..JMML. .JMM.  .JMML.    .JMML. `"bmmmd'  .JMMmmmmMMM .JMMmmmmMMM
+                        BEGIN ARTICLE PAGE
+                                                                                   -->
+        {% if article == null %}
+        <div id="content">
+          <div class="container article">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="header row">
+                  <div class="col-md-12">
+                        <h2>{{system.snippets.article_translation_missing}} {{system.language_name_localized}}</h2>
+                  </div>
+                </div>
+              </div>
+              {{ sidebar_main }}
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div id="content">
+          <div class="container article">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="header row">
+                  <div class="col-md-12">
+                      <h2>
+                        {{ article.subject_plain }}
+                      </h2>
+                  </div>
+                </div><!-- Support Head -->
+                <div class="body row">
+                  <div class="col-md-12">
+                    {{ article.body }}
+                  </div>
+                </div>
+                {% if article.number_of_attachments > 0 %}
+                <div class="row attachments">
+                  <div class="col-md-12">
+                      <h3>{{system.snippets.attachments}}</h3>
+                      <table class="table table-hover">
+                        {% for attachment in article.kb_article_attachments %}
+                        <tr>
+                          <td>{{ attachment.name }}</td><a href="{{ attachment.faq_download_url }}" class="kb_article_attachment_a" target="_blank"></a></td>
+                          <td><a href="{{ attachment.faq_download_url }}" class="kb_article_attachment_a" target="_blank">{{ attachment.name }}</a></td></a>
+                        </tr>
+                        {% endfor %}
+                      </table>
+                  </div>
+                </div>
+                {% endif %}
+                <div class="row rateblock">
+                  <div class="col-md-12">
+                    {%if system.snippets.was_article_helpful != "" %}
+                      <p>{{system.snippets.was_article_helpful}}</p>
+                    {% else %}
+                      <p> {{ system.snippets.did_you_find_this_article_helpful }}</p>
+                    {% endif %}
+                    {{ rate_block }}
+                  </div>
+                </div>
+                <div class="row footer">
+                  <div class="col-md-6">
+                    <p class="updated">{{system.snippets.last_update}} - <time>{{ article.updated_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p %Z' }}</time></p>
+                  </div>
+                  <div class="col-md-6">
+                    <ul class="social">
+                        <li class="btn-facebook">
+                          <a href="#" data-href="https://developers.facebook.com/docs/plugins/" data-type="button_count" class="btn-facebook fb-share-button" target="pop">Share</a>
+                        </li>
+                        <li>
+                          <a href="https://twitter.com/share" target="pop" class="twitter-share-button">Tweet</a>
+                        </li>
+                        <li>
+                          <a data-size="medium" data-annotation="bubble" data-width="94" class="rndbtn btn-flat btn-gplus g-plusone">Share</a>
+                        </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <!--Begin Sidebar-->
+              {{ sidebar_main }}
+              <!--END Sidebar-->
+            </div><!--Main Row-->
+          </div><!--Container Article-->
+        </div><!--#Content-->
+        {% endif %}
+<!--end:page_article-->
+{% elsif page == "page_topic" %}
+<!--begin:page_topic-->
+        <!--
+        MMP""MM""YMM   .g8""8q. `7MM"""Mq.`7MMF' .g8"""bgd
+        P'   MM   `7 .dP'    `YM. MM   `MM. MM .dP'     `M
+             MM      dM'      `MM MM   ,M9  MM dM'       `
+             MM      MM        MM MMmmdM9   MM MM
+             MM      MM.      ,MP MM        MM MM.
+             MM      `Mb.    ,dP' MM        MM `Mb.     ,'
+           .JMML.      `"bmmd"' .JMML.    .JMML. `"bmmmd'
+                        BEGIN TOPIC PAGE
+                                                     -->
+        <div id="content">
+          <div class="container topic">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                  <div class="header row">
+                    <div class="col-md-7 col-sm-12">
+                      {% if topic == null %}
+                        <h2>{{system.snippets.topic_translation_missing}} {{system.language_name_localized}}</h2>
+                      {% else %}
+                        <h2>{{ topic.name }}</h2>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-5 col-sm-12 switch">
+                      {% if topic.question_count > 0 and topic.allow_questions and site.questions_enabled_config %}
+                        {% if type == 'questions' %}
+                          <a class="btn btn-pill active" href='{{ topic.public_questions_url }}'>{{system.snippets.questions}}</a>
+                        {% else %}
+                          <a class="btn btn-pill" href='{{ topic.public_questions_url }}'>{{system.snippets.questions}}</a>
+                        {% endif %}
+                      {% endif %}
+                      {% if topic.article_count > 0 %}
+                        {% if type == 'articles' %}
+                          <a class="btn btn-pill active" href='{{ topic.public_articles_url }}' id="desk-article-list-link">{{system.snippets.articles}}</a>
+                        {% else %}
+                          <a class="btn btn-pill" href='{{ topic.public_articles_url }}' id="desk-qna-list-link">{{system.snippets.articles}}</a>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="body row">
+                    {% if topic == null %}
+                    {% else %}
+                      <div class="col-md-12">
+                        {% if type == 'articles' %}
+                          {% for article in articles %}
+                            <div class="article row nomarg">
+                              <h3><a href="{{ article.public_url }}" title="{{ article.subject_plain }}">{{ article.subject_plain }}</a></h3>
+                              <p>{{ article.body_plain | clip:210 }}</p>
+                              <a href="{{ article.public_url }}" class="btn btn-pill">{{ system.snippets.read_article }}</a>
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                          {% for question in questions %}
+                            <div class="qna row nomarg">
+                              <h3><a href="{{ question.public_url }}" title="{{ question.subject_plain }}">{{ question.subject_plain }}</a></h3>
+                              <p>{{ question.body_plain | clip:210 }}</p>
+                              {% if question.answers_agent_count > 0 %}
+                                <a class="btn btn-pill" href="{{ question.public_url }}">
+                                  <span>{{ question.answers_agent_count }}</span>
+                                  {{ site.agent_name_config }}
+                                  {{ system.snippets.answer | pluralize: question.answers_agent_count, system.snippets.answers }}
+                                </a>
+                              {% else %}
+                               <a href="{{ question.public_url }}" class="btn btn-pill">View Question</a>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        {% endif %}
+                      </div><!-- end col-md-12 -->
+                    {% endif %}
+                  </div>
+              </div>
+              <!--Begin Sidebar-->
+              {{ sidebar_main }}
+              <!--END Sidebar-->
+            </div>
+            <div id="pagination">
+              <div class="support-paginate row">
+                {{ more_article_block }}
+              </div>
+            </div>
+          </div>
+        </div>
+<!--end:page_topic-->
+{% elsif page == "page_search_result" %}
+<!--begin:page_search_result-->
+        <!--
+         .M"""bgd `7MM"""YMM        db      `7MM"""Mq.   .g8"""bgd `7MMF'  `7MMF'
+        ,MI    "Y   MM    `7       ;MM:       MM   `MM..dP'     `M   MM      MM
+        `MMb.       MM   d        ,V^MM.      MM   ,M9 dM'       `   MM      MM
+          `YMMNq.   MMmmMM       ,M  `MM      MMmmdM9  MM            MMmmmmmmMM
+        .     `MM   MM   Y  ,    AbmmmqMA     MM  YM.  MM.           MM      MM
+        Mb     dM   MM     ,M   A'     VML    MM   `Mb.`Mb.     ,'   MM      MM
+        P"Ybmmd"  .JMMmmmmMMM .AMA.   .AMMA..JMML. .JMM. `"bmmmd'  .JMML.  .JMML.
+                        BEGIN SEARCH PAGE
+                                                                            -->
+        <div id="content">
+          <div class="container search">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="header row">
+                  <div class="col-md-12">
+                    {% if MBSearchPage == true %}
+                      <h2><i class="fa fa-search"></i> <span id="total"></span> {{system.snippets.results_found_for}} "{{ search_term }}"</h2>
+                    {% else %}
+                      <h2><i class="fa fa-search"></i> {{ number_search_results }} {{system.snippets.results_found_for}} "{{ search_term }}"</h2>
+                    {% endif %}
+                  </div>
+                </div>
+                {% if MBSearchPage == true %}
+                <!-- Start - Dont Edit between these lines -->
+                <div id="siteResults">
+                  <div class="body row">
+                    <div class="col-md-12">
+                      <div role="tabpanel">
+                        <ul class="nav nav-tabs" role="tablist"></ul>
+                        <div class="tab-content"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- End - Don't Edit between these lines -->
+                {% endif %}
+                {% if MBSearchPage == true %}
+                <div id="brandResults" class="hidden">
+                {% endif %}
+                {% for result in search_results %}
+                  {% if result.class_name == "Article" %}
+                    <article class="row result article">
+                      <div class="col-md-12">
+                        <h3>
+                          <a href='{{ result.public_url }}' title="{{ result.subject_plain }}">{{ result.subject_plain }}</a>
+                        </h3>
+                        {% if MBSearchPage == true %}<label class="{{desk.current_brand.name}}">{{desk.current_brand.name}}</label>{% endif %}
+                        <p>{{ result.body_plain | clip:210 }}</p>
+                        <a href="{{ result.public_url }}" class="btn btn-pill">{{ system.snippets.read_article }}</a>
+                      </div>
+                    </article>
+                  {% elsif result.class_name == "Question" and MBSearchExcludeQuestions != true %}
+                    <article class="row result question">
+                      <div class="col-md-1">
+                        <span class="gravatar">
+                          {{ question.from_email | gravatar_image: gravatar_unknown_user, ssl }}
+                        </span>
+                      </div>
+                      <div class="col-md-11">
+                        <h3>
+                          <a href='{{ result.public_url }}' title="{{ result.subject_plain }}">{{ result.subject_plain }}</a>
+                        </h3>
+                        {% if MBSearchPage == true %}<label class="{{desk.current_brand.name}}">{{desk.current_brand.name}}</label>{% endif %}
+                        <p>{{ result.body_plain | clip:210 }}</p>
+                      </div>
+                      <div class="col-md-12">
+                        {% if result.answers_agent_count > 0 %}
+                         <a href='{{ result.public_url }}' class="btn btn-pill" title="{{ result.subject_plain }}">
+                            <span>{{ result.answers_agent_count }}</span>
+                            {{ site.agent_name_config }}
+                            {{ system.snippets.answer | pluralize: result.answers_agent_count, system.snippets.answers }}
+                          </a>
+                        {% elsif result.answers_customer_count > 0 %}
+                          <a href='{{ result.public_url }}' class="btn btn-pill" title="{{ result.subject_plain }}">
+                            <span>{{ result.answers_customer_count }}</span>
+                            Community {{ system.snippets.answer | pluralize: result.answers_customer_count, system.snippets.answers }}
+                          </a>
+                        {% else %}
+                            <a href='{{ result.public_url }}' class="btn btn-pill" title="{{ result.subject_plain }}">View Question</a>
+                        {% endif %}
+                      </div>
+                    </article> <!-- article row -->
+                  {% endif %}
+                {% endfor %}
+
+                {% if MBSearchPage == true %}
+                </div>
+                {% endif %}
+
+                <!-- No Results -->
+                {% if number_search_results == 0 %}
+                  <div class="row noresults">
+                    <div class="col-md-12">
+                      <h3>{{system.snippets.sorry_try_another_search}} <a href='{{desk.system.links.email}}'>{{system.snippets.send_us_an_email}}</a></h3>
+                    </div>
+                  </div>
+                {% endif %}
+
+                <!-- pagination -->
+                <div class="row footer">
+                    <div id='pagination'>
+                    {{ more_search_block }}
+                    </div>
+                </div>
+              </div><!-- End 8 Column -->
+
+              <!--Begin Sidebar-->
+              {{ sidebar_main }}
+              <!--END Sidebar-->
+
+            </div><!-- main row -->
+          </div><!-- .container results -->
+        </div><!-- #content-->
+<!--end:page_search_result-->
+{% elsif page == "question_show" %}
+<!--begin:question_show-->
+        <!--
+          .g8""8q. `7MMF'   `7MF'`7MM"""YMM   .M"""bgd MMP""MM""YMM `7MMF' .g8""8q. `7MN.   `7MF'
+        .dP'    `YM. MM       M    MM    `7  ,MI    "Y P'   MM   `7   MM .dP'    `YM. MMN.    M
+        dM'      `MM MM       M    MM   d    `MMb.          MM        MM dM'      `MM M YMb   M
+        MM        MM MM       M    MMmmMM      `YMMNq.      MM        MM MM        MM M  `MN. M
+        MM.      ,MP MM       M    MM   Y  , .     `MM      MM        MM MM.      ,MP M   `MM.M
+        `Mb.    ,dP' YM.     ,M    MM     ,M Mb     dM      MM        MM `Mb.    ,dP' M     YMM
+          `"bmmd"'    `bmmmmd"'  .JMMmmmmMMM P"Ybmmd"     .JMML.    .JMML. `"bmmd"' .JML.    YM
+              MMb
+               `bood'         BEGIN QUESTION SHOW                                           -->
+        <div id="desk-external-variables-question_show" class="desk-external-variables hide">
+          <div id="system-snippets-just_moderated">{{just_moderated}}</div>
+          <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-answer_required">{{system.snippets.answer_required}}</div>
+          <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+        </div>
+        {% assign customer_answer_count = question.answers_customer_count %}
+        {% assign agent_answer_count = question.answers_agent_count %}
+        {% assign answers_count = question.answers_count %}
+        {% assign best_answer = question.best_answer %}
+        <div id="content">
+          <div class="container qna">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <!-- THE QUESTION -->
+                <div class="row header question">
+                    <div class="col-md-1">
+                      <span class="gravatar">
+                        {{ question.from_email | gravatar_image: gravatar_unknown_user, ssl }}
+                      </span>
+                    </div>
+                    <div class="col-md-11">
+                      <h2>{{ question.subject }}</h2>
+                      <h3 class="meta">{{ question.from_name }} &mdash; {{ question.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p %Z' }} </h3>
+                    </div>
+                </div>
+                <div class="row body question">
+                  <div class="col-md-12">
+                     <p>{{ question.body }}</p>
+                     <hr>
+                  </div>
+                </div><!-- THE QUESTION -->
+                {% if best_answer != nil %}
+                    <div class="row header answer">
+                      <div class="col-md-12">
+                        <h2>
+                          {{ answers_count }}
+                          {{ system.snippets.community_answer | pluralize: answer_count, system.snippets.community_answers }}
+                        </h2>
+                      </div>
+                    </div>
+
+                    <div class="row body answer best">
+                      <div class="col-md-1">
+                        <span class="gravatar">
+                          {{ best_answer.from_email | gravatar_image: gravatar_unknown_user,  ssl }}
+                        </span>
+                      </div>
+                      <div  class="col-md-11">
+                        <h3>
+                          {{ best_answer.from_name }}
+                          - <small>
+                            {{ best_answer.updated_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p %Z' }}
+                          </small>
+                          <span class="best">{{system.snippets.best_answer}}</span>
+                        </h3>
+                          <p>{{ best_answer.body }}</p>
+
+                          {% if question.answers_count > 1 %}
+                          <hr />
+                          <a href="#bestanswer">{{system.snippets.view_conversation}}</a>
+                          {% endif %}
+
+                      </div>
+                    </div>
+                {% endif %}
+                {% if question.non_best_answers_exist %}
+                  {% if best_answer == nil %}
+                    <div class="row header answer">
+                      <div class="col-md-12">
+                        <h2>
+                          {{ answers_count }}
+                          {{ system.snippets.community_answer | pluralize: answer_count, system.snippets.community_answers }}
+                        </h2>
+                      </div>
+                    </div>
+                  {% endif %}
+                  {% for answer in question.answers %}
+                      <div class="row body answer">
+                        <div class="col-md-1">
+                          <span class="gravatar">
+                            {{ answer.from_email | gravatar_image: gravatar_unknown_user,  ssl }}
+                          </span>
+                        </div>
+                        <div class="col-md-11">
+                          <h3>
+                            {{ answer.from_name }}<small class="muted"> - {{ answer.updated_at | in_time_zone: site.timezone | date: '%b %d, %Y at %I:%M%p %Z' }}</small>
+                          </h3>
+                          {% if answer.agent? %}
+                            <h4><span class="label muted">{{ site.company_name }} {{ site.agent_name_config }}</span></h4>
+                          {% endif %}
+                          <p>{{ answer.body }}</p>
+                            {% if question.answers_count > 1 %}
+                            <!--
+                            <a href="#best-answer-conversation">{{system.snippets.view_conversation}}</a>
+                            -->
+                            {% endif %}
+                            {% if current_user == answer.user %}
+                              <div class='answer-rating rating-true'>
+                                <div>
+                                  <span class='score {% if answer.rating_value > 0 %}score-positive{% elsif answer.rating_value < 0 %}score-negative{% endif %}' id='score-{{answer.id}}'>{{ answer.rating_value }}</span>
+                                  <span class='dialog'>{{system.snippets.score}}</span>
+                                </div>
+                              </div>
+                            {% else %}
+                              <div class='answer-rating rating-{{ answer | already_rated_by_user: current_user }}'>
+                                <div>
+                                  <span class='dialog'>{{system.snippets.rated}} : </span>
+                                  <span class='score {% if answer.rating_value > 0 %}score-positive{% elsif answer.rating_value < 0 %}score-negative{% endif %}' id='score-{{answer.id}}'>{{ answer.rating_value }}</span>
+                                  {{ answer | already_rated_up: current_user }}
+                                  {{ answer | already_rated_down: current_user }}
+                                </div>
+                              </div>
+                            {% endif %}
+                            <hr />
+                        </div>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                  <div class="reply row">
+                    {% if question.allow_answers? != true or question.case.closed? %}
+                      <div class="alert">{{system.snippets.question_closed}}</div>
+                    {% else %}
+                      <h2>{{system.snippets.post_public_answer}}</h2>
+                      {{ form_begin }}
+                      <div class="form panel panel-default">
+                        <div class="panel-footer no-body ">
+                          {% if current_user == nil or current_user.is_guest %}
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="interaction_name">{{system.snippets.your_name}} <span class="muted">({{system.snippets.required}})</span></label>
+                                    <input id="interaction_name" maxlength="100" class="form-control" name="interaction[name]" value="{{ interaction.name }}" type="text" />
+                                 </div>
+                              </div>
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label for="interaction_email">{{system.snippets.your_email}} <span class="muted">({{system.snippets.required}})</span></label>
+                                  <input id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" value="{{ interaction.email }}" type="text" />
+                                </div>
+                              </div>
+                            </div>
+                          {% endif %}
+                          <div class="form-group">
+                            <label for="qna_body">{{system.snippets.answer}} <span class="muted">({{system.snippets.required}})</span></label>
+                            <textarea cols="40" id="qna_body" class="form-control" name="qna[body]" rows="6">{{ qna.body }}</textarea>
+                          </div>
+                          <div class="input-button">
+                            <input id="answer_submit" class="btn btn-submit" name="commit" type="submit" value="{{system.snippets.post_answer}}" />
+                          </div>
+                        </div>
+                      </div>
+                      {{ form_end }}
+                    {% endif %}
+                  </div>
+              </div><!-- 8 col-->
+            {{ sidebar_main }}
+            </div><!--ROW-->
+          </div><!--Container-->
+        </div><!--Content-->
+<!--end:question_show-->
+{% elsif page == "question_new" %}
+<!--begin:question_new-->
+        <!--
+          .g8""8q. `7MMF'   `7MF'`7MM"""YMM   .M"""bgd MMP""MM""YMM `7MMF' .g8""8q. `7MN.   `7MF'
+        .dP'    `YM. MM       M    MM    `7  ,MI    "Y P'   MM   `7   MM .dP'    `YM. MMN.    M
+        dM'      `MM MM       M    MM   d    `MMb.          MM        MM dM'      `MM M YMb   M
+        MM        MM MM       M    MMmmMM      `YMMNq.      MM        MM MM        MM M  `MN. M
+        MM.      ,MP MM       M    MM   Y  , .     `MM      MM        MM MM.      ,MP M   `MM.M
+        `Mb.    ,dP' YM.     ,M    MM     ,M Mb     dM      MM        MM `Mb.    ,dP' M     YMM
+          `"bmmd"'    `bmmmmd"'  .JMMmmmmMMM P"Ybmmd"     .JMML.    .JMML. `"bmmd"' .JML.    YM
+              MMb
+               `bood'         BEGIN QUESTION NEW                                           -->
+        <div id="desk-external-variables-question_new" class="desk-external-variables hide">
+          <div id="qna-kb_topic_id">{{qna.kb_topic_id}}</div>
+          <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-subject_required">{{system.snippets.subject_required}}</div>
+          <div id="system-snippets-question_required">{{system.snippets.question_required}}</div>
+          <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+        </div>
+
+        <div id="content">
+          <div class="container qna">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="row nomarg header">
+                  <h2>{{system.snippets.post_public_question}}</h2>
+                </div>
+                <div class="row nomarg body">
+                  <div class="panel panel-default form">
+                    {{form_begin}}
+                    <div class="panel-body">
+                      <div class="form-group row">
+                        <div class="col-md-6">
+                          <label for="qna_kb_topic_id" class="control-label">{{system.snippets.topic}} ({{system.snippets.required}}):</label>
+                          <select id='qna_kb_topic_id' name='qna[kb_topic_id]' class="form-control">
+                            {% for topic in topics %}
+                            <option value='{{ topic.id }}'>{{ topic.name | clip:30 }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      {% if current_user == nil or current_user.is_guest %}
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                            <label for="interaction_name" class="control-label">{{system.snippets.your_name}} ({{system.snippets.required}}):</label>
+                            <input value="{{ interaction.name }}" id="interaction_name" class="form-control" maxlength="100" name="interaction[name]" type="text" />
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label for="interaction_email" class="control-label">{{system.snippets.your_email}} ({{system.snippets.required}}):</label>
+                            <input value="{{ interaction.email }}" id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" type="text" />
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="form-group">
+                        <label for="qna_subject" class="control-label">{{system.snippets.subject}} ({{system.snippets.required}}):</label>
+                        <input id='qna_subject' maxlength='100' name='qna[subject]' class="form-control" type='text' value='{% if search_term and search_term != '' %}{{search_term}}{% else %}{{qna.subject}}{%endif%}' />
+                      </div>
+                      <div class="form-group">
+                        <label for="qna_body" class="control-label">{{system.snippets.your_question}} ({{system.snippets.required}}):</label>
+                        <textarea id='qna_body' class="form-control" rows="6" cols="6" name='qna[body]'>{{qna.body}}</textarea>
+                      </div>
+                      <div class="autosuggest visible-xs right-side hide"> </div>
+                    </div>
+                    <div class="panel-footer input-button">
+                      <input id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.ask_question}}' />
+                    </div>
+                    {{form_end}}
+                  </div><!-- end .panel -->
+                </div><!-- end .body.row -->
+              </div><!-- end .col-md-8 -->
+              {{ sidebar_suggest }}
+            </div><!-- end .row -->
+          </div><!-- .qna -->
+        </div> <!-- #content -->
+        <!-- Old qna -->
+<!--end:question_new-->
+{% elsif page == "question_pre_create" %}
+<!--begin:question_pre_create-->
+        <!--
+          .g8""8q. `7MMF'   `7MF'`7MM"""YMM   .M"""bgd MMP""MM""YMM `7MMF' .g8""8q. `7MN.   `7MF'
+        .dP'    `YM. MM       M    MM    `7  ,MI    "Y P'   MM   `7   MM .dP'    `YM. MMN.    M
+        dM'      `MM MM       M    MM   d    `MMb.          MM        MM dM'      `MM M YMb   M
+        MM        MM MM       M    MMmmMM      `YMMNq.      MM        MM MM        MM M  `MN. M
+        MM.      ,MP MM       M    MM   Y  , .     `MM      MM        MM MM.      ,MP M   `MM.M
+        `Mb.    ,dP' YM.     ,M    MM     ,M Mb     dM      MM        MM `Mb.    ,dP' M     YMM
+          `"bmmd"'    `bmmmmd"'  .JMMmmmmMMM P"Ybmmd"     .JMML.    .JMML. `"bmmd"' .JML.    YM
+              MMb
+               `bood'         BEGIN QUESTION PRE CREATE                                           -->
+
+        <div id="desk-external-variables-question_new" class="desk-external-variables hide">
+          <div id="qna-kb_topic_id">{{qna.kb_topic_id}}</div>
+          <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-subject_required">{{system.snippets.subject_required}}</div>
+          <div id="system-snippets-question_required">{{system.snippets.question_required}}</div>
+          <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+        </div>
+
+        <div id="content">
+          <div id="PreCreate" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="PreCreateModal" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close onclick-go-back"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h2>
+                    {% if number_search_results > 0 %}
+                      <i class="fa fa-exclamation-triangle warning"></i> {{system.snippets.not_posted_question_yet}}
+                    {% else %}
+                      <i class="fa fa-spinner spin"></i> {{system.snippets.please_wait}}
+                    {% endif %}
+                    </h2>
+                    <p class="subheader">{{system.snippets.article_help}}</p>
+                </div>
+                {% if number_search_results > 0 %}
+                  <div class="modal-body">
+                      <ul id='search-results' class='results unstyled'>
+                        {% for result in search_results limit:3 %}
+                          <li class='{% if result.class_name == "Question" and result.featured? == false %}question{% elsif result.class_name == "Question" and result.featured? %}question featured{% elsif result.class_name == "Article" %}article{% endif %}'>
+                            <h4>
+                              {% if result.class_name == "Question" %}
+                                  <i class="fa fa-question"></i>
+                              {% elsif result.class_name == "Article" %}
+                                  <i class="fa fa-file-text-o"></i>
+                              {% endif %}
+                              <a href='{{ result.public_url }}' target='_blank'>
+                                {{ result.subject_plain | clip:70 }}
+                              </a>
+                            </h4>
+                            <p>
+                              {{ result.body_plain | clip:105 }}
+                            </p>
+                          </li>
+                        {% endfor %}
+                        <li class="note">
+                          ({{system.snippets.click_open_window}})
+                        </li>
+                      </ul>
+                  </div>
+                  <div class="modal-footer">
+                      <div id='form'>
+                        {{form_begin}}
+                            <div class='input-button'>
+                              {{system.snippets.did_not_help}}
+                              <input id="question_submit" name="commit" type="submit" value="{{system.snippets.post_question}}" class="btn btn-submit " />
+                              <img alt='Ajax-loader-small' id='email_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display: none; margin: 7px 0 0 5px; position: absolute;' />
+                            </div>
+                        {{form_end}}
+                      </div>
+                  </div>
+                {% else %}
+                  <div class="modal-body">
+                      <h1>{{system.snippets.please_wait}}</h1>
+                  </div>
+                {% endif %}
+              </div><!-- MODAL CONTENT -->
+            </div><!-- MODAL DIALOG /  MODAL LG -->
+          </div><!-- #PreCreate -->
+          <div class="container qna">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="row nomarg header">
+                     <h2>{{system.snippets.post_public_question}}</h2>
+                </div>
+                <div class="row nomarg body">
+                  <div class="panel panel-default form">
+                    {{form_begin}}
+                    <div class="panel-body">
+                      <div class="form-group row">
+                        <div class="col-md-6">
+                          <label for="qna_kb_topic_id" class="control-label">{{system.snippets.topic}} ({{system.snippets.required}}):</label>
+                          <select id='qna_kb_topic_id' name='qna[kb_topic_id]' class="form-control">
+                            {% for topic in topics %}
+                            <option value='{{ topic.id }}'>{{ topic.name | clip:30 }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      {% if current_user == nil or current_user.is_guest %}
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                            <label for="interaction_name" class="control-label">{{system.snippets.your_name}} ({{system.snippets.required}}):</label>
+                            <input value="{{ interaction.name }}" id="interaction_name" class="form-control" maxlength="100" name="interaction[name]" type="text" />
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label for="interaction_email" class="control-label">{{system.snippets.your_email}} ({{system.snippets.required}}):</label>
+                            <input value="{{ interaction.email }}" id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" type="text" />
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="form-group">
+                        <label for="qna_subject" class="control-label">{{system.snippets.subject}} ({{system.snippets.required}}):</label>
+                        <input id='qna_subject' maxlength='100' name='qna[subject]' class="form-control" type='text' value='{% if search_term and search_term != '' %}{{search_term}}{% else %}{{qna.subject}}{%endif%}' />
+                      </div>
+                      <div class="form-group">
+                        <label for="qna_body" class="control-label">{{system.snippets.your_question}} ({{system.snippets.required}}):</label>
+                        <textarea id='qna_body' class="form-control" rows="6" cols="6" name='qna[body]'>{{qna.body}}</textarea>
+                      </div>
+                      <div class="autosuggest visible-xs right-side hide"> </div>
+                    </div>
+                    <div class="panel-footer input-button">
+                      <input id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.ask_question}}' />
+                    </div>
+                    {{form_end}}
+                  </div><!-- end .panel -->
+                </div><!-- end .body.row -->
+              </div><!-- end .col-md-8 -->
+              {{ sidebar_suggest }}
+            </div><!-- end .row -->
+          </div>
+        </div>
+        <!-- Old qna -->
+
+<!--end:question_pre_create-->
+{% elsif page == "email_new" %}
+<!--begin:email_new-->
+        <!--
+        `7MM"""YMM  `7MMM.     ,MMF'      db      `7MMF'`7MMF'
+          MM    `7    MMMb    dPMM       ;MM:       MM    MM
+          MM   d      M YM   ,M MM      ,V^MM.      MM    MM
+          MMmmMM      M  Mb  M' MM     ,M  `MM      MM    MM
+          MM   Y  ,   M  YM.P'  MM     AbmmmqMA     MM    MM      ,
+          MM     ,M   M  `YM'   MM    A'     VML    MM    MM     ,M
+        .JMMmmmmMMM .JML. `'  .JMML..AMA.   .AMMA..JMML..JMMmmmmMMM
+                        BEGIN EMAIL NEW
+                                                                -->
+        <div id="desk-external-variables-email_new" class="desk-external-variables hide">
+          <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-subject_required">{{system.snippets.subject_required}}</div>
+          <div id="system-snippets-question_required">{{system.snippets.question_required}}</div>
+          <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+          <div id="max_number_attachments">{{desk.system.max_attachments}}</div>
+          <div id="system-snippets-add_attachment">{{system.snippets.add_attachment}}</div>
+        </div>
+        <div id="content">
+          <div class="container email">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="row nomarg header">
+                    <h2>{{system.snippets.email_us}}</h2>
+                </div>
+                <div class="row nomarg body">
+                  <div class="panel panel-default form">
+                   {{form_begin}}
+                    <div class="panel-body">
+                      {% if current_user == nil or current_user.is_guest %}
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="interaction_name" class="control-label">{{system.snippets.your_name}} ({{system.snippets.required}}):</label>
+                              <input value="{{ interaction.name }}" id="interaction_name" class="form-control" maxlength="100" name="interaction[name]" type="text" required />
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="interaction_email" class="control-label">{{system.snippets.your_email}} ({{system.snippets.required}}):</label>
+                              <input value="{{ interaction.email }}" id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" type="email" required />
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="form-group">
+                        <label for="email_subject" class="control-label">{{system.snippets.subject}} ({{system.snippets.required}}):</label>
+                        <input id='email_subject' class="form-control" maxlength='100' name='email[subject]' type='text' value='{% if search_term and search_term != '' %}{{search_term}}{% else %}{{email.subject}}{%endif%}' required/>
+                      </div>
+                      <div class="form-group">
+                        <label for="email_body" class="control-label">{{system.snippets.message}} ({{system.snippets.required}}):</label>
+                        <textarea id='email_body' class="form-control" rows="6" cols="6" name='email[body]' required>{{email.body}}</textarea>
+                      </div>
+                      <div class="form-group attachments">
+                        <label for="case_attachment[attachment]" class="control-label"><i class="fa fa-paperclip"></i>{{system.snippets.file_attachment}}</label>
+                        <div class="desk_file_upload">
+                            <input type="button" value="{{system.snippets.choose_file}}">
+                            <input name="case_attachment[attachment]" size="84" type="file">
+                            <div class="faux-file-field">
+                              <input disabled="disabled" type="text">
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="panel-footer input-button">
+                      <button id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.send_email}}'>{{system.snippets.send_email}}</button>
+                    </div>
+                    {{form_end}}
+                  </div>
+                </div>
+              </div>
+              {{ sidebar_suggest }}
+            </div><!-- row -->
+          </div><!-- container -->
+        </div><!-- content -->
+<!--end:email_new-->
+{% elsif page == "email_pre_create" %}
+<!--begin:email_pre_create-->
+        <!--
+        `7MM"""YMM  `7MMM.     ,MMF'      db      `7MMF'`7MMF'
+          MM    `7    MMMb    dPMM       ;MM:       MM    MM
+          MM   d      M YM   ,M MM      ,V^MM.      MM    MM
+          MMmmMM      M  Mb  M' MM     ,M  `MM      MM    MM
+          MM   Y  ,   M  YM.P'  MM     AbmmmqMA     MM    MM      ,
+          MM     ,M   M  `YM'   MM    A'     VML    MM    MM     ,M
+        .JMMmmmmMMM .JML. `'  .JMML..AMA.   .AMMA..JMML..JMMmmmmMMM
+                        BEGIN EMAIL CREATE
+                                                                -->
+          <div id="desk-external-variables-email_pre_create" class="desk-external-variables hidden">
+            <div id="search_term">{{search_term}}</div>
+            <div id="number_search_results">{{number_search_results}}</div>
+            <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+            <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+            <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+            <div id="system-snippets-subject_required">{{system.snippets.subject_required}}</div>
+            <div id="system-snippets-question_required">{{system.snippets.question_required}}</div>
+            <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+          </div>
+          <div id="PreCreate" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="PreCreateModal" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close onclick-go-back"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                      <h2>
+                      {% if number_search_results > 0 %}
+                        <i class="fa fa-exclamation-triangle warning"></i> {{system.snippets.not_posted_question_yet}}
+                      {% else %}
+                        <i class="fa fa-spinner fa-spin"></i> {{system.snippets.please_wait}}
+                      {% endif %}
+                      </h2>
+                      <p class="subheader">{{system.snippets.article_help}}</p>
+                  </div>
+                  {% if number_search_results > 0 %}
+                    <div class="modal-body">
+                        <ul id='search-results' class='results unstyled'>
+                          {% for result in search_results limit:3 %}
+                            <li class='{% if result.class_name == "Question" and result.featured? == false %}question{% elsif result.class_name == "Question" and result.featured? %}question featured{% elsif result.class_name == "Article" %}article{% endif %}'>
+
+                              <h4>
+                              {% if result.class_name == "Question" %}
+                                  <i class="fa fa-question"></i>
+                               {% elsif result.class_name == "Article" %}
+                                  <i class="fa fa-file-text-o"></i>
+                               {% endif %}
+                                <a href='{{ result.public_url }}' target='_blank'>
+                                  {{ result.subject_plain | clip:70 }}
+                                </a>
+                              </h4>
+                              <p>
+                                {{ result.body_plain | clip:105 }}
+                              </p>
+                            </li>
+                          {% endfor %}
+                          <li class="note">
+                            ({{system.snippets.click_open_window}})
+                          </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <div id='form'>
+                          {{form_begin}}
+                              <div class='input-button'>
+                                {{system.snippets.did_not_help}}
+                                <input id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.send_your_email}}' />
+                                <img alt='Ajax-loader-small' id='email_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display: none; margin: 7px 0 0 5px; position: absolute;' />
+                              </div>
+                          {{form_end}}
+                        </div>
+                    </div>
+                  {% else %}
+                    <div class="modal-body">
+                        <h1>{{system.snippets.please_wait}}</h1>
+                    </div>
+                  {% endif %}
+                </div><!-- MODAL CONTENT -->
+              </div><!-- MODAL DIALOG /  MODAL LG -->
+          </div><!-- #PreCreate -->
+          <div id="content">
+            <div class="container email">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="row nomarg header">
+                      <h2>{{system.snippets.email_us}}</h2>
+                  </div>
+                  <div class="row nomarg body">
+                    <div class="panel panel-default form">
+                     {{form_begin}}
+                      <div class="panel-body">
+                        {% if current_user == nil or current_user.is_guest %}
+                          <div class="row">
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="interaction_name" class="control-label">{{system.snippets.your_name}} ({{system.snippets.required}}):</label>
+                                <input value="{{ interaction.name }}" id="interaction_name" class="form-control" maxlength="100" name="interaction[name]" type="text" required />
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label for="interaction_email" class="control-label">{{system.snippets.your_email}} ({{system.snippets.required}}):</label>
+                                <input value="{{ interaction.email }}" id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" type="email" required />
+                              </div>
+                            </div>
+                          </div>
+                        {% endif %}
+                        <div class="form-group">
+                          <label for="email_subject" class="control-label">{{system.snippets.subject}} ({{system.snippets.required}}):</label>
+                          <input id='email_subject' class="form-control" maxlength='100' name='email[subject]' type='text' value='{% if search_term and search_term != '' %}{{search_term}}{% else %}{{email.subject}}{%endif%}' required/>
+                        </div>
+                        <div class="form-group">
+                          <label for="email_body" class="control-label">{{system.snippets.message}} ({{system.snippets.required}}):</label>
+                          <textarea id='email_body' class="form-control" rows="6" cols="6" name='email[body]' required>{{email.body}}</textarea>
+                        </div>
+                        <div class="form-group attachments">
+                          <label for="case_attachment[attachment]" class="control-label"><i class="fa fa-paperclip"></i>{{system.snippets.file_attachment}}</label>
+                          <div class="desk_file_upload">
+                              <input type="button" value="{{system.snippets.choose_file}}">
+                              <input name="case_attachment[attachment]" size="84" type="file">
+                              <div class="faux-file-field">
+                                <input disabled="disabled" type="text">
+                              </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="panel-footer input-button">
+                        <button id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.send_email}}'>{{system.snippets.send_email}}</button>
+                      </div>
+                      {{form_end}}
+                    </div>
+                  </div>
+                </div>
+                {{ sidebar_suggest }}
+              </div><!-- row -->
+            </div><!-- container -->
+          </div><!-- CONTENT -->
+<!--end:email_pre_create-->
+{% elsif page == "email_submitted" %}
+<!--begin:email_submitted-->
+        <!--
+        `7MM"""YMM  `7MMM.     ,MMF'      db      `7MMF'`7MMF'
+          MM    `7    MMMb    dPMM       ;MM:       MM    MM
+          MM   d      M YM   ,M MM      ,V^MM.      MM    MM
+          MMmmMM      M  Mb  M' MM     ,M  `MM      MM    MM
+          MM   Y  ,   M  YM.P'  MM     AbmmmqMA     MM    MM      ,
+          MM     ,M   M  `YM'   MM    A'     VML    MM    MM     ,M
+        .JMMmmmmMMM .JML. `'  .JMML..AMA.   .AMMA..JMML..JMMmmmmMMM
+                        BEGIN EMAIL SUBMITTED
+                                                               -->
+        <div id="content">
+          <div class="container email">
+            <div class="header row">
+              <div class="col-md-12">
+                <h2>{{system.snippets.email_us}}</h2>
+                <h3>{{system.snippets.email_success}}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--end:email_submitted-->
+{% elsif page == "chat_new" %}
+<!--begin:chat_new-->
+        <!--
+          .g8"""bgd `7MMF'  `7MMF'      db   MMP""MM""YMM
+        .dP'     `M   MM      MM       ;MM:  P'   MM   `7
+        dM'       `   MM      MM      ,V^MM.      MM
+        MM            MMmmmmmmMM     ,M  `MM      MM
+        MM.           MM      MM     AbmmmqMA     MM
+        `Mb.     ,'   MM      MM    A'     VML    MM
+          `"bmmmd'  .JMML.  .JMML..AMA.   .AMMA..JMML.
+                        BEGIN CHAT NEW
+                                                          -->
+        <div id="desk-external-variables-chat_new" class="desk-external-variables hide">
+          <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-question_required">{{system.snippets.question_required}}</div>
+          <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+        </div>
+        <div id="content">
+          <div class="container chat">
+            <div class="body row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="header row nomarg">
+                    <h2>{{system.snippets.live_chat}}</h2>
+                </div>
+                <div class="row nomarg body">
+                  <div class="panel panel-default form">
+                  {{form_begin}}
+                    <div class="panel-body">
+                      {% if current_user == nil or current_user.is_guest %}
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                            <label class="control-label" for="interaction_name">{{system.snippets.your_name}} ({{system.snippets.required}}):</label>
+                            <input value="{{ interaction.name }}" id="interaction_name" class="form-control" maxlength="100" name="interaction[name]" type="text" />
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label class="control-label" for="interaction_email">{{system.snippets.your_email}} ({{system.snippets.required}}):</label>
+                            <input value="{{ interaction.email }}" id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" type="text" />
+                          </div>
+                        </div>
+                      {% endif %}
+                      <div class="form-group">
+                        <label for="chat_subject" class="control-label">{{system.snippets.question}} ({{system.snippets.required}}):</label>
+                        <textarea id='chat_subject' name='chat[subject]' type='text' value='{% if search_term and search_term != '' %}{{search_term}}{% else %}{{chat.subject}}{%endif%}' rows="6" cols="40" class="form-control">{{chat.body}}</textarea>
+                      </div>
+                      <div class="autosuggest visible-xs right-side hide"></div>
+                    </div>
+                    <div class="panel-footer input-button">
+                       <input id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.go_chat}}' />
+                    </div>
+                  {{form_end}}
+                  </div> <!-- .panel-default.form -->
+                </div>
+              </div> <!-- .col-md-8 -->
+             {{ sidebar_suggest }}
+            </div><!-- Row -->
+          </div><!-- Container Chat-->
+        </div><!-- #Content -->
+<!--end:chat_new-->
+{% elsif page == "chat_pre_create" %}
+<!--begin:chat_pre_create-->
+        <!--
+          .g8"""bgd `7MMF'  `7MMF'      db   MMP""MM""YMM
+        .dP'     `M   MM      MM       ;MM:  P'   MM   `7
+        dM'       `   MM      MM      ,V^MM.      MM
+        MM            MMmmmmmmMM     ,M  `MM      MM
+        MM.           MM      MM     AbmmmqMA     MM
+        `Mb.     ,'   MM      MM    A'     VML    MM
+          `"bmmmd'  .JMML.  .JMML..AMA.   .AMMA..JMML.
+                        BEGIN CHAT PRE CREATE
+                                                          -->
+        <div id="desk-external-variables-chat_pre_create" class="desk-external-variables hide">
+          <div id="search_term">{{search_term}}</div>
+          <div id="number_search_results">{{number_search_results}}</div>
+          <div id="system-snippets-name_required">{{system.snippets.name_required}}</div>
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-question_required">{{system.snippets.question_required}}</div>
+          <div id="system-snippets-exceeding_max_chars">{{system.snippets.exceeding_max_chars}}</div>
+        </div>
+        <div id="PreCreate" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="PreCreateModal" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close onclick-go-back"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h2>
+                    {% if number_search_results > 0 %}
+                      <i class="fa fa-exclamation-triangle warning"></i> {{system.snippets.chat_room_ready}}
+                    {% else %}
+                      <i class="fa fa-spinner fa-pulse"></i> {{system.snippets.please_wait}}
+                    {% endif %}
+                    </h2>
+                    <p class="subheader">{{system.snippets.article_help}}</p>
+                </div>
+              {% if number_search_results > 0 %}
+                <div class="modal-body">
+                    <ul id='search-results' class='results unstyled'>
+                      {% for result in search_results limit:3 %}
+                      <li class='{% if result.class_name == "Question" and result.featured? == false %}question{% elsif result.class_name == "Question" and result.featured? %}question featured{% elsif result.class_name == "Article" %}article{% endif %}'>
+                        <h4>
+                          {% if result.class_name == "Question" %}
+                              <i class="fa fa-question"></i>
+                          {% elsif result.class_name == "Article" %}
+                              <i class="fa fa-file-text-o"></i>
+                          {% endif %}
+                          <a href='{{ result.public_url }}' target='_blank'>
+                            {{ result.subject_plain | clip:70  }}
+                          </a>
+                        </h4>
+                        <p>
+                          {{ result.body_plain | clip:105 }}
+                        </p>
+                      </li>
+                      {% endfor %}
+                      <li class="note">
+                          ({{system.snippets.click_open_window}})
+                      </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                  {{form_begin}}
+                  <div class="input-button">
+                    {{system.snippets.did_not_help}}
+                     <input id="chat_submit" name="commit" type="submit" value="{{system.snippets.start_chat}}" class="btn btn-submit" />
+                  </div>
+                  {{form_end}}
+                </div>
+              {% else %}
+                <div class="modal-body">
+                    <h1>{{system.snippets.chat_room_ready}}</h1>
+                </div>
+                <div class="modal-footer">
+                    <p class="subheader">{{system.snippets.click_button_chat}}</p>
+                    <div id='form'>
+                      {{form_begin}}
+                        <div class='input-button'>
+                          <input id='chat_submit' name='commit' type='submit' class="btn btn-submit" value='{{system.snippets.start_chat}}' />
+                        </div>
+                      {{form_end}}
+                    </div>
+                </div>
+              {% endif %}
+            </div><!-- MODAL CONTENT -->
+          </div><!-- MODAL DIALOG /  MODAL LG -->
+        </div><!-- #PreCreate -->
+        <div id="content">
+          <div class="container chat">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="header row nomarg">
+                    <h2>
+                      {% if number_search_results > 0 %}
+                        <i class="fa fa-exclamation-triangle"></i> {{system.snippets.not_posted_question_yet}}
+                      {% else %}
+                        <i class="fa fa-spinner fa-pulse"></i> {{system.snippets.please_wait}}
+                      {% endif %}
+                    </h2>
+                    <p class="subheader">{{system.snippets.article_help}}</p>
+                </div>
+                <div class="row nomarg body">
+                  <div class="panel panel-default form">
+                  {{form_begin}}
+                    <div class="panel-body">
+                      {% if current_user == nil or current_user.is_guest %}
+                        <div class="row">
+                          <div class="form-group col-md-6">
+                              <label class="control-label" for="interaction_name">{{system.snippets.your_name}} ({{system.snippets.required}}):</label>
+                              <input value="{{ interaction.name }}" id="interaction_name" class="form-control" maxlength="100" name="interaction[name]" type="text" />
+                            </div>
+                            <div class="form-group col-md-6">
+                              <label class="control-label" for="interaction_email">{{system.snippets.your_email}} ({{system.snippets.required}}):</label>
+                              <input value="{{ interaction.email }}" id="interaction_email" class="form-control" maxlength="100" name="interaction[email]" type="text" />
+                            </div>
+                          </div>
+                        {% endif %}
+                        <div class="form-group">
+                          <label for="chat_subject" class="control-label">{{system.snippets.question}} ({{system.snippets.required}}):</label>
+                          <textarea id='chat_subject' name='chat[subject]' type='text' value='{% if search_term and search_term != '' %}{{search_term}}{% else %}{{chat.subject}}{%endif%}' rows="6" cols="40" class="form-control">{{chat.body}}</textarea>
+                        </div>
+                        <div class="autosuggest visible-xs right-side hide"></div>
+                      </div>
+                      <div class="panel-footer input-button">
+                         <input id='email_submit' class="btn btn-submit" name='commit' type='submit' value='{{system.snippets.go_chat}}' />
+                      </div>
+                    {{form_end}}
+                    </div> <!-- .panel-default.form -->
+                  </div>
+                </div> <!-- .col-md-8 -->
+               {{ sidebar_suggest }}
+            </div><!-- Row-->
+          </div><!-- Container Chat-->
+        </div><!-- #Content -->
+<!--end:chat_pre_create-->
+{% elsif page == "myportal_index" %}
+<!--begin:myportal_index-->
+          <!--
+          `7MM"""Mq.   .g8""8q. `7MM"""Mq. MMP""MM""YMM   db      `7MMF'
+            MM   `MM..dP'    `YM. MM   `MM.P'   MM   `7  ;MM:       MM
+            MM   ,M9 dM'      `MM MM   ,M9      MM      ,V^MM.      MM
+            MMmmdM9  MM        MM MMmmdM9       MM     ,M  `MM      MM
+            MM       MM.      ,MP MM  YM.       MM     AbmmmqMA     MM      ,
+            MM       `Mb.    ,dP' MM   `Mb.     MM    A'     VML    MM     ,M
+          .JMML.       `"bmmd"' .JMML. .JMM.  .JMML..AMA.   .AMMA..JMMmmmmMMM
+                          BEGIN MY PORTAL INDEX
+                                                                              -->
+          <div id="registration-in-progress" class="hide">
+            <img alt='Ajax-loader-small' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' />
+            {{desk.system.snippets.registration_in_progress}}
+          </div>
+          <div id="content">
+            <div class="container myportal index">
+              <div class="row">
+                <!-- FULL WIDTH IF COMPANY CASES ARE ENDABLED  -->
+                {% if desk.customer.can_access_company_tickets? %}
+                <div class="col-md-12">
+                {% else %}
+                <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                {% endif %}
+                  <div class="header row">
+                    <div class="col-md-12">
+                      <!-- <h2>{{desk.system.snippets.my_cases}}</h2> -->
+                      <ul class="case-menu">
+                        <li>
+                          <select id="CaseFilter" class="form-control">
+                            <option value="my">{{desk.system.snippets.show_my_cases}}</option>
+                            {% if desk.customer.can_access_company_tickets? %}
+                            <option value="company" selected="selected">{{desk.system.snippets.show_all_cases}}</option>
+                            {% endif %}
+                            <option value="7">{{desk.system.snippets.show_last_num_days | format_snippet: '"num":"7"' }}</option>
+                            <option value="30">{{desk.system.snippets.show_last_num_days | format_snippet: '"num":"30"' }}</option>
+                          </select>
+                        </li>
+                        <li>
+                          <label class="checkbox">
+                            <input class="checkbox" id="ActiveOnly" type="checkbox" name="checkbox"></input>
+                            <span></span>
+                          </label>
+                          <label for="checkbox">{{desk.system.snippets.active_only}}</label>
+                        </li>
+                        {% if site.email_enabled_config %}
+                          <li class="new"><a href="{{desk.system.links.email}}" class="button">{{desk.system.snippets.create_new_case}}</a></li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="body row">
+                    <div class="col-md-12">
+                      <table id="MyCases" class="table table-striped table-hover {% if MyCasesSort == true %} sort {% endif %}">
+                        <thead>
+                          <tr>
+                            <th class="hidden-xs"><span>{{desk.system.snippets.case_id}}</span></th>
+                            <th class="hidden-xs"><span>{{desk.system.snippets.assigned_agent}}</span></th>
+                            <th><span>{{desk.system.snippets.subject}}</span></th>
+                            {% if desk.customer.can_access_company_tickets? %}
+                            <th class="hidden-xs"><span>{{desk.system.snippets.from}}</span></th>
+                            {% endif %}
+                            <th class="hidden-xs"><span>{{desk.system.snippets.updated}}</span></th>
+                            <th><span>{{desk.system.snippets.status}}</span></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for case in desk.page.content.cases %}
+                          <tr>
+                            <td class='hidden-xs a-caseid'>{{ case.id }}</td>
+                            <td class="hidden-xs"><span>{{case.user.name_public | show_something: desk.system.snippets.unassigned}}</span></td>
+                            <td class='a-casesubject'><img src='{{ case.channel_icon }}'/><a href="{{ case.portal_url }}">{{ case.subject | clip:30 }}</a></td>
+                            {% if desk.customer.can_access_company_tickets? %}
+                            <td class='a-casefrom hidden-xs'>{{case.customer.first_name}}</td>
+                            {% endif %}
+                            <td class='a-casecreated hidden-xs'>{{ case.updated_at | in_time_zone: site.timezone | date: '%b %d %Y' }}</td>
+                            <td class='a-casestatus'>{% case case.status.id %}
+                              {% when 10 %}
+                              {{desk.system.snippets.case_new}}
+                              {% when 30 %}
+                              {{desk.system.snippets.case_open}}
+                              {% when 50 %}
+                              {{desk.system.snippets.case_pending}}
+                              {% when 70 %}
+                              {{desk.system.snippets.case_resolved}}
+                              {% when 90 %}
+                              {{desk.system.snippets.case_closed}}
+                              {% endcase %}
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                      <div id='pagination'>
+                        {{ desk.page.content.more_cases_block }}
+                      </div>
+                    </div>
+                  </div><!-- .row -->
+                </div>
+                <!-- ONLY SHOW SIDEBAR IF COMPANY CASES IS DISABLED -->
+                {% if desk.customer.can_access_company_tickets? %} {% else %}
+                <!--Begin Sidebar-->
+                {{ sidebar_main }}
+                <!--END Sidebar-->
+                {% endif %}
+              </div><!-- .row-->
+            </div><!-- .portal-->
+          </div><!-- #content -->
+
+
+
+
+          {% if MyCasesSort == true %}
+            <input id="MyCaseSort" class="hidden" value="true" />
+          {% endif %}
+
+
+<!--end:myportal_index-->
+{% elsif page == "myportal_show" %}
+<!--begin:myportal_show-->
+        <!--
+        `7MM"""Mq.   .g8""8q. `7MM"""Mq. MMP""MM""YMM   db      `7MMF'
+          MM   `MM..dP'    `YM. MM   `MM.P'   MM   `7  ;MM:       MM
+          MM   ,M9 dM'      `MM MM   ,M9      MM      ,V^MM.      MM
+          MMmmdM9  MM        MM MMmmdM9       MM     ,M  `MM      MM
+          MM       MM.      ,MP MM  YM.       MM     AbmmmqMA     MM      ,
+          MM       `Mb.    ,dP' MM   `Mb.     MM    A'     VML    MM     ,M
+        .JMML.       `"bmmd"' .JMML. .JMM.  .JMML..AMA.   .AMMA..JMMmmmmMMM
+                        BEGIN MY PORTAL SHOW
+                                                                          -->
+        {% assign case = desk.page.content.case %}
+        <div id="desk-external-variables-myaccount" class="desk-external-variables hide">
+          <div id="system-snippets-reply_required">{{system.snippets.message_required}}</div>
+        </div>
+        <div id="content">
+          <div class="container myportal case">
+            <div class="body row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <!-- START CASE VIEW -->
+                {% assign numder = 1 %}
+                <div class="interactions">
+                    <!-- ///////////////////////////////////////////////////////////////
+                                 **** START CASE SOURCE  SECTION ****
+                    /////////////////////////////////////////////////////////////// -->
+                      {% if case.is_email_channel? %}<!--EMAIL-->
+                        {% for email in case.emails %}
+                          {% if numder == 1 %}
+                            <div class="header row">
+                              <div class="col-md-1">
+                                <span class='gravatar'>
+                                  {% if email.inbound? %}
+                                    {% if case.customer.facebook.profile_image_url != nil %}
+                                      <img src="{{ case.customer.facebook.profile_image_url }}" class="gravatar" />
+                                    {% elsif case.customer.twitter.profile_image_url != nil %}
+                                      <img src="{{ case.customer.twitter.profile_image_url }}" width="50" height="50" class="gravatar twitter-avatar" />
+                                    {% else %}
+                                      {{ email.from | gravatar_image: gravatar_unknown_user,   ssl }}
+                                    {% endif %}
+                                  {% else %}
+                                    {{ email.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                  {% endif %}
+                                </span>
+                              </div>
+                              <div class="col-md-8">
+                                <h2>{{case.subject}}</h2>
+                                <h3 class='meta'>
+                                    {% if email.inbound? %}
+                                      {{email.from_name | show_something: case.customer.name}}
+                                    {% else %}
+                                      {{email.agent.name_public}}
+                                    {% endif %}
+                                      - <span>{{email.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p' }}</span>
+                                </h3>
+                              </div>
+                            </div>
+                            <div class="body row">
+                              <div class="col-md-12">
+                                {% if email.is_erased? %}
+                                  {% capture params %}"name":"{{email.erased_by.name}}"{% endcapture %}
+                                  <div class='interaction-body'>{{desk.system.snippets.content_erased | format_snippet: params }}</div>
+                                {% else %}
+                                  <div class='interaction-body'>{{ email.new_html | escape_newlines }}</div>
+                                {% endif %}
+                              </div>
+                            </div>
+                            {% if email.attachments.size > 0 %}
+                            <div class="row attachments">
+                              <div class="col-md-12">
+                                  <h3>{{desk.system.snippets.attachments}}</h3>
+                                  <table class="table table-hover">
+                                    {% for attachment in email.attachments%}
+                                    <tr>
+                                      <td>{{ attachment.file_name }}</td><a href="{{ attachment.faq_download_url }}" class="kb_article_attachment_a" target="_blank"></a></td>
+                                      <td><a href="{{ attachment.faq_download_url }}" class="kb_article_attachment_a" target="_blank">{{ attachment.file_name }}</a></td></a>
+                                    </tr>
+                                    {% endfor %}
+                                  </table>
+                              </div>
+                            </div>
+                            {% endif %}
+                            <div class="status row">
+                              <div class="col-md-8 stats">
+                                  <table class="table table-hover">
+                                    <tbody>
+                                      <tr>
+                                        <td>{{ system.snippets.case_status }}</td>
+                                        <td>
+                                            {% case case.status.id %}
+                                            {% when 10 %}
+                                              {{desk.system.snippets.case_new}}
+                                            {% when 30 %}
+                                              {{desk.system.snippets.case_open}}
+                                            {% when 50 %}
+                                              {{desk.system.snippets.case_pending}}
+                                            {% when 70 %}
+                                              {{desk.system.snippets.case_resolved}}
+                                            {% when 90 %}
+                                              {{desk.system.snippets.case_closed}}
+                                            {% endcase %}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>{{desk.system.snippets.case_id}}:</td>
+                                        <td>{{case.id}}</td>
+                                      </tr>
+                                      <tr>
+                                        <td>{{desk.system.snippets.assigned_agent}}:</td>
+                                        <td>{{case.user.name_public | show_something: desk.system.snippets.unassigned}}</td>
+                                      </tr>
+                                      {% if desk.customer.can_access_company_tickets? %}
+                                      <tr>
+                                        <td>{{desk.system.snippets.from}}:</td>
+                                        <td>{{case.customer.first_name}} {{case.customer.last_name}}</td>
+                                      </tr>
+                                      {% endif %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                              <div class="col-md-4">
+                                {% if case.status.id == 10 or case.status.id == 30 or case.status.id == 50 %}
+                                  {{resolve_or_reopen_button}}
+                                {% elsif case.status.id != 90 %}
+                                  <button id="reOpen" onclick="javascript: $('div#ReplyRow').toggleClass('hidden'); $('#interaction_body').focus();
+                                  $('<p>Add a response to reopen this case</p>').insertBefore('#interaction_body').slideDown(1000);"> {{ desk.system.snippets.reopen_case }}</button>
+                                {% endif %}
+                              </div>
+                            </div>
+                            {% assign numder = 2 %}
+                          {% else %}
+                            <div class="row answer">
+                              <div class="col-md-1">
+                                <div class="gravatar">
+                                  {% if email.inbound? %}
+                                    {% if case.customer.facebook.profile_image_url != nil %}
+                                      <img src="{{ case.customer.facebook.profile_image_url }}" class="gravatar" />
+                                    {% elsif case.customer.twitter.profile_image_url != nil %}
+                                      <img src="{{ case.customer.twitter.profile_image_url }}" width="48" height="48" class="gravatar twitter-avatar" />
+                                    {% else %}
+                                      {{ email.from | gravatar_image: gravatar_unknown_user,   ssl }}
+                                    {% endif %}
+                                  {% else %}
+                                    {{ email.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                  {% endif %}
+                                </div>
+                              </div>
+                              <div class="interaction-details col-md-11">
+                                <h3 class='meta'>
+                                   {% if email.inbound? %}
+                                    {{email.from_name | show_something: case.customer.name}}
+                                  {% else %}
+                                    {{email.agent.name_public}}
+                                  {% endif %}
+                                  <small> - {{email.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p' }}</small>
+                                </h3>
+                                {% if email.is_erased? %}
+                                  {% capture params %}"name":"{{email.erased_by.name}}"{% endcapture %}
+                                  <div class='interaction-body'>{{desk.system.snippets.content_erased | format_snippet: params }}</div>
+                                {% else %}
+                                  <div class='interaction-body'>{{ email.new_html | escape_newlines }}</div>
+                                {% endif %}
+                                {% if email.attachments.size > 0 %}
+                                  {{desk.system.snippets.attachments}}
+                                  {% for attachment in email.attachments %}
+                                  | <a target="_blank" href="{{attachment.url}}">{{attachment.file_name}}</a>
+                                  {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+                      {% elsif case.is_qna_channel? %}<!--QNA-->
+                        {% assign question = case.question %}
+                        {% if question.hidden? %}
+                          <div class='interaction row'>
+                            <h3>{{system.snippets.not_posted_question_yet}}</h3>
+                          </div>
+                        {% else %}
+                          <div class='header row'>
+                            <div class="col-md-1">
+                              <span class='gravatar'>
+                                {% if case.customer.facebook.profile_image_url != nil %}
+                                <img src="{{ case.customer.facebook.profile_image_url }}" class="gravatar" />
+                                {% elsif case.customer.twitter.profile_image_url != nil %}
+                                <img src="{{ case.customer.twitter.profile_image_url }}" width="48" height="48" class="gravatar twitter-avatar" />
+                                {% else %}
+                                {{ question.from_email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                {% endif %}
+                              </span>
+                            </div>
+                            <div class="col-md-11">
+                                <h2>{{case.subject}}</h2>
+                                <h3 class="meta">
+                                   {{question.from_name | show_something: case.customer.name}} -
+                                  {{question.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p %Z' }}
+                                </h3>
+
+                            </div>
+                          </div>
+                          <div class="row body">
+                            <div class="col-md-12">
+                               {{ question.body_plain | escape_newlines }}
+                            </div>
+                          </div>
+                          <div class="status row">
+                              <div class="col-md-8 stats">
+                                  <table class="table table-hover">
+                                    <tbody>
+                                      <tr>
+                                        <td>{{ system.snippets.case_status }}</td>
+                                        <td>
+                                            {% case case.status.id %}
+                                            {% when 10 %}
+                                              {{desk.system.snippets.case_new}}
+                                            {% when 30 %}
+                                              {{desk.system.snippets.case_open}}
+                                            {% when 50 %}
+                                              {{desk.system.snippets.case_pending}}
+                                            {% when 70 %}
+                                              {{desk.system.snippets.case_resolved}}
+                                            {% when 90 %}
+                                              {{desk.system.snippets.case_closed}}
+                                            {% endcase %}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>{{desk.system.snippets.case_id}}:</td>
+                                        <td>{{case.id}}</td>
+                                      </tr>
+                                      <tr>
+                                        <td>{{desk.system.snippets.assigned_agent}}:</td>
+                                        <td>{{case.user.name_public | show_something: desk.system.snippets.unassigned}}</td>
+                                      </tr>
+                                      {% if desk.customer.can_access_company_tickets? %}
+                                      <tr>
+                                        <td>{{desk.system.snippets.from}}:</td>
+                                        <td>{{case.customer.first_name}} {{case.customer.last_name}}</td>
+                                      </tr>
+                                      {% endif %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                              <div class="col-md-4">
+                                {% if case.status.id == 10 or case.status.id == 30 or case.status.id == 50 %}
+                                  {{resolve_or_reopen_button}}
+                                {% elsif case.status.id != 90 %}
+                                  <button id="reOpen" onclick="javascript: $('div#ReplyRow').toggleClass('hidden'); $('#interaction_body').focus();
+                                  $('<p>Add a response to reopen this case</p>').insertBefore('#interaction_body').slideDown(1000);"> {{ desk.system.snippets.reopen_case }}</button>
+                                {% endif %}
+                              </div>
+                          </div>
+                          <!-- ///////////////////////////////////////////////////////////////
+                                              **** CASE ANSWERS  SECTION ****
+                          /////////////////////////////////////////////////////////////// -->
+
+                          {% for answer in case.answers %}
+                            <div class="answer row">
+                                <div class="col-md-1">
+                                  <span class='gravatar'>
+                                    {% if answer.inbound? %}
+                                    {% if answer.customer.facebook.profile_image_url != nil %}
+                                    <img src="{{ answer.customer.facebook.profile_image_url }}" class="gravatar" />
+                                    {% elsif answer.customer.twitter.profile_image_url != nil %}
+                                    <img src="{{ answer.customer.twitter.profile_image_url }}" width="48" height="48" class="gravatar twitter-avatar" />
+                                    {% else %}
+                                    {{ answer.from_email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                    {% endif %}
+                                    {% else %}
+                                    {{ answer.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                    {% endif %}
+                                  </span>
+                                </div>
+                                <div class="col-md-11">
+                                    <h3 class='meta'>
+                                       {% if answer.inbound? %}
+                                          {{answer.from_name | show_something: case.customer.name}}
+                                      {% else %}
+                                          {{answer.agent.name_public}}
+                                      {% endif %}
+                                       - <small>{{answer.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p %Z' }}</small>
+                                    </h3>
+                                    {% if answer.is_erased? %}
+                                    {% capture params %}"name":"{{answer.erased_by.name}}"{% endcapture %}
+                                        {{desk.system.snippets.content_erased | format_snippet: params }}
+                                    {% else %}
+                                        {{ answer.body_plain | escape_newlines }}
+                                    {% endif %}
+                                </div>
+                            </div><!--ROW-->
+                          {% endfor %}<!--CASE ANSWERS-->
+                        {% endif %}
+                      {% elsif case.is_chat_channel? %}
+
+                          {% assign chat = case.chat %}
+                          <div class="row header">
+                            <h2>{{case.subject}}</h2>
+                          </div>
+
+                          <ul class="chat-msgs">
+                            {% for message in chat.messages %}
+                              {% if message.from_system? %}
+                                <li class="system">
+                                  <div class="row system-msg">
+                                    <h4 class="meta">
+                                      {% if message.text contains 'left' or message.text contains 'ended' %}<i class="fa fa-unlink danger"></i>{% endif %}
+                                      {% if message.text contains 'queue' or message.text contains 'wait' %} <i class="fa fa-clock-o warning"></i> {% endif %}
+                                      {% if message.text contains 'entered' or message.text contains 'connected' %} <i class="fa fa-bolt success"></i> {% endif %}
+                                      {{message.text}} <small>at {{message.created_at | in_time_zone: site.timezone | date: '%I:%M%p' }}</small>
+
+                                    </h3>
+                                  </div>
+                                </li>
+                              {% else %}
+                                <li>
+                                  {% if desk.page.content.case.customer.name == message.user.name %}
+                                    <div class="row chat user">
+                                  {% else %}
+                                    <div class="row chat agent">
+                                  {% endif %}
+                                      <div class="col-md-1">
+                                          {% if desk.page.content.case.customer.name == message.user.name %}
+                                            {% if desk.page.content.case.customer.email  != "" %}
+                                             {{ desk.page.content.case.customer.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                            {% endif %}
+                                          {% else %}
+                                            {{ message.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                          {%endif %}
+                                      </div>
+                                      <div class="col-md-11">
+                                        <h3 class="meta">
+                                          {{message.user.name}}
+                                          {% if desk.page.content.case.customer.name == message.user.name %}
+                                            <i class="fa fa-user success"></i>
+                                          {% else %}
+                                            <i class="fa fa-star warning"></i>
+                                          {% endif %}
+                                           - <small class='date'>{{message.created_at | in_time_zone: site.timezone | date: '%I:%M%p' }}</small>
+                                        </h3>
+                                       {{ message.text | escape_newlines }}
+                                      </div>
+                                    </div>
+                                </li>
+                              {% endif %}
+                            {% endfor %}
+                          </ul>
+                          <div class="status row">
+                              <div class="col-md-8 stats">
+                                  <table class="table table-hover">
+                                    <tbody>
+                                      <tr>
+                                        <td>{{ system.snippets.case_status }}:</td>
+                                        <td>
+                                            {% case case.status.id %}
+                                            {% when 10 %}
+                                              {{desk.system.snippets.case_new}}
+                                            {% when 30 %}
+                                              {{desk.system.snippets.case_open}}
+                                            {% when 50 %}
+                                              {{desk.system.snippets.case_pending}}
+                                            {% when 70 %}
+                                              {{desk.system.snippets.case_resolved}}
+                                            {% when 90 %}
+                                              {{desk.system.snippets.case_closed}}
+                                            {% endcase %}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>{{desk.system.snippets.case_id}}:</td>
+                                        <td>{{case.id}}</td>
+                                      </tr>
+                                      <tr>
+                                        <td>{{desk.system.snippets.assigned_agent}}:</td>
+                                        <td>{{case.user.name_public | show_something: desk.system.snippets.unassigned}}</td>
+                                      </tr>
+                                      {% if desk.customer.can_access_company_tickets? %}
+                                      <tr>
+                                        <td>{{desk.system.snippets.from}}:</td>
+                                        <td>{{case.customer.first_name}} {{case.customer.last_name}}</td>
+                                      </tr>
+                                      {% endif %}
+                                    </tbody>
+                                  </table>
+                              </div>
+                              <div class="col-md-4">
+                                {% if case.status.id == 10 or case.status.id == 30 or case.status.id == 50 %}
+                                  {{resolve_or_reopen_button}}
+                                {% elsif case.status.id != 90 %}
+                                  <button id="reOpen" onclick="javascript: $('div#ReplyRow').toggleClass('hidden'); $('#interaction_body').focus();
+                                  $('<p>Add a response to reopen this case</p>').insertBefore('#interaction_body').slideDown(1000);"> {{ desk.system.snippets.reopen_case }}</button>
+                                {% endif %}
+                              </div>
+                          </div>
+                      {% elsif case.is_twitter_channel? %}
+                          <!-- ///////////////////////////////////////////////////////////////
+                                              **** TWITTER  SECTION ****
+                          /////////////////////////////////////////////////////////////// -->
+                          <div class="header row">
+                            <h2>{{case.subject}}</h2>
+                          </div>
+                          {% for tweet in case.tweets %}
+                            {% assign reply_to = tweet.public_url %}
+                            {% assign tweet_dm = tweet.dm %}
+
+                            <div class='answer twitter row'>
+                              <div class="col-md-1">
+                                <span class='gravatar'>
+                                  {% if tweet.inbound? %}
+                                  <img src="{{ case.customer.twitter.profile_image_url }}" width="48" height="48" class="gravatar twitter-avatar" />
+                                  {% else %}
+                                  {{ tweet.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                  {% endif %}
+                                </span>
+                              </div>
+
+                              <div class='col-md-11'>
+                                <h3 class='meta'>
+                                  {% if tweet.inbound? %}
+                                    {{case.customer.name}} <small>via <a href="http://twitter.com/{{ tweet.twitter_customer.login }}" target="_blank">{{ tweet.twitter_customer.login }}</a></small>
+                                  {% else %}
+                                    {{tweet.agent.name_public}}
+                                  {% endif %}
+                                  - <small>{{tweet.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p' }}</small>
+                                </h3>
+
+                                {% if tweet.is_erased? %}
+                                {% capture params %}"name":"{{tweet.erased_by.name}}"{% endcapture %}
+                                    {{desk.system.snippets.content_erased | format_snippet: params }}
+                                {% else %}
+                                    {{ tweet.subject | escape_newlines }}
+                                {% endif %}
+                              </div>
+                            </div>
+                          {% endfor %}
+                          <div class="status row">
+                            <div class="col-md-6 stats">
+                                <table class="table table-hover">
+                                  <tbody>
+                                    <tr>
+                                      <td>{{ system.snippets.case_status }}:</td>
+                                      <td>
+                                          {% case case.status.id %}
+                                          {% when 10 %}
+                                            {{desk.system.snippets.case_new}}
+                                          {% when 30 %}
+                                            {{desk.system.snippets.case_open}}
+                                          {% when 50 %}
+                                            {{desk.system.snippets.case_pending}}
+                                          {% when 70 %}
+                                            {{desk.system.snippets.case_resolved}}
+                                          {% when 90 %}
+                                            {{desk.system.snippets.case_closed}}
+                                          {% endcase %}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>{{desk.system.snippets.case_id}}:</td>
+                                      <td>{{case.id}}</td>
+                                    </tr>
+                                    <tr>
+                                      <td>{{desk.system.snippets.assigned_agent}}:</td>
+                                      <td>{{case.user.name_public | show_something: desk.system.snippets.unassigned}}</td>
+                                    </tr>
+                                    {% if desk.customer.can_access_company_tickets? %}
+                                    <tr>
+                                      <td>{{desk.system.snippets.from}}:</td>
+                                      <td>{{case.customer.first_name}} {{case.customer.last_name}}</td>
+                                    </tr>
+                                    {% endif %}
+                                  </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                              {% if tweet_dm %}
+                                <p>This is a private message (Direct Message). Please log into <a href="http://www.twitter.com" target="_blank">Twitter</a> to view and reply to this thread.</p>
+                              {% else %}
+                                <a class="button" href="{{ reply_to }}" target="_blank">View and reply to this tweet on Twitter</a>
+                              {% endif %}
+                            </div>
+                          </div>
+                      {% elsif case.is_facebook_channel? %}
+                        <div class="row remove">
+                          <h1>{{case.subject}}</h1>
+                        </div>
+                        <!-- ///////////////////////////////////////////////////////////////
+                                            **** FACEBOOK  SECTION ****
+                        /////////////////////////////////////////////////////////////// -->
+
+                        {% for facebook_feeds in case.facebook_feed_items_non_draft %}
+                        {% assign thread_url = facebook_feeds.public_url %}
+                            <div class='interaction row'>
+                              <div class="col-md-1">
+                                <span class='gravatar'>
+                                  {% if case.customer.id == facebook_feeds.from_customer.id %}
+                                  {% if case.customer.facebook.profile_image_url != nil %}
+                                  <img src="{{ case.customer.facebook.profile_image_url }}" class="gravatar" />
+                                  {% else %}
+                                  {{ facebook_feeds.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                  {% endif %}
+                                  {% else %}
+                                  {{ facebook_feeds.agent.email | gravatar_image: gravatar_unknown_user,   ssl }}
+                                  {% endif %}
+                                </span>
+                              </div>
+                              <div class='interaction-details col-md-7'>
+                                <h3 class='meta'>
+                                  <small class='date'>{{facebook_feeds.created_at | in_time_zone: site.timezone | date: '%b %d, %Y %I:%M%p' }}</small>
+                                  {% if facebook_feeds.agent == nil %}
+                                  <span>{{ facebook_feeds.from_customer.name_public }}</span>
+                                  {% else %}
+                                  <span>{{ facebook_feeds.agent.name }} via {{ facebook_feeds.from_customer.name_public }}</span>
+                                  {% endif %}
+                                </h3>
+                                {% if facebook_feeds.is_erased? %}
+                                {% capture params %}"name":"{{facebook_feeds.erased_by.name}}"{% endcapture %}
+                                <div class='interaction-body'>{{desk.system.snippets.content_erased | format_snippet: params }}</div>
+                                {% else %}
+                                <div class='interaction-body'>{{ facebook_feeds.message | escape_newlines }}</div>
+                                {% endif %}
+                              </div>
+                            </div>
+                            {% endfor %}
+                            <div class="case-footer">
+                              <p><a href="{{ thread_url }}" target="_blank">View and reply to this thread on Facebook</a></p>
+                            </div>
+                      {% elsif case.is_phone_channel? %}<!--PH-->
+                        <div class="header row">
+                          <h2>Phone Case</h2>
+                          {{ case.description | escape_newlines }}
+                        </div>
+                        <div class="status row">
+                            <div class="col-md-6 stats">
+                                <table class="table table-hover">
+                                  <tbody>
+                                    <tr>
+                                      <td>{{ system.snippets.case_status }}:</td>
+                                      <td>
+                                          {% case case.status.id %}
+                                          {% when 10 %}
+                                            {{desk.system.snippets.case_new}}
+                                          {% when 30 %}
+                                            {{desk.system.snippets.case_open}}
+                                          {% when 50 %}
+                                            {{desk.system.snippets.case_pending}}
+                                          {% when 70 %}
+                                            {{desk.system.snippets.case_resolved}}
+                                          {% when 90 %}
+                                            {{desk.system.snippets.case_closed}}
+                                          {% endcase %}
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td>{{desk.system.snippets.case_id}}:</td>
+                                      <td>{{case.id}}</td>
+                                    </tr>
+                                    <tr>
+                                      <td>{{desk.system.snippets.assigned_agent}}:</td>
+                                      <td>{{case.user.name_public | show_something: desk.system.snippets.unassigned}}</td>
+                                    </tr>
+                                    {% if desk.customer.can_access_company_tickets? %}
+                                    <tr>
+                                      <td>{{desk.system.snippets.from}}:</td>
+                                      <td>{{case.customer.first_name}} {{case.customer.last_name}}</td>
+                                    </tr>
+                                    {% endif %}
+                                  </tbody>
+                                </table>
+                            </div>
+                        </div>
+                      {% endif %}
+
+
+                      <!-- ///////////////////////////////////////////////////////////////
+                                        **** REPLY ROW  SECTION ****
+                      /////////////////////////////////////////////////////////////// -->
+                      {% if case.can_accept_replies and case.customer.id == desk.customer.id %}
+                      <div class="reply row {% if case.resolved? %} hidden {% endif %}" id="ReplyRow">
+                            <!-- REPLY HEADER -->
+                            {% if case.is_email_channel? %}
+                              <h2>{{desk.system.snippets.reply_to_this_case}}</h2>
+                            {% else %}
+                              <h2>{{system.snippets.post_public_answer}}</h2>
+                            {% endif %}
+                            <!-- REPLY FORM -->
+                            <div id="form" class="form panel panel-default">
+                              <div class="panel-footer no-body">
+                                {% if case.is_email_channel? %}
+                                  {{form_begin}}
+                                    <div class="form-group">
+                                      <label for="interaction_body">{{system.snippets.answer}} <span class="muted">({{system.snippets.required}})</span></label>
+                                      <textarea class="form-control" id="interaction_body" name="interaction[body]" rows="6" cols="40"></textarea>
+                                    </div>
+                                    <div class="form-group attachments">
+                                      <label for="case_attachment[attachment]" class="control-label"><i class="fa fa-paperclip"></i>{{system.snippets.file_attachment}}</label>
+                                      <div class="desk_file_upload">
+                                          <input type="button" value="{{system.snippets.choose_file}}">
+                                          <input name="case_attachment[attachment]" size="84" type="file">
+                                          <div class="faux-file-field">
+                                            <input disabled="disabled" type="text">
+                                          </div>
+
+                                      </div>
+                                    </div>
+                                    <input id='reply_submit' name='commit' type='submit' value='{{system.snippets.send_text}}' class="btn btn-submit" />
+                                  {{form_end}}
+                                {% else %}
+                                  {{form_begin}}
+                                  <div class="form-group">
+                                    <label for="interaction_body">{{system.snippets.answer}} <span class="muted">({{system.snippets.required}})</span></label>
+                                    <textarea class="form-control"  id="interaction_body" name="interaction[body]" rows="6" cols="40"></textarea>
+                                  </div>
+                                  <div class="input-button">
+                                    <input id='reply_submit' name='commit' type='submit' value='{{system.snippets.post_answer}}' class="btn btn-submit" />
+                                  </div>
+                                  {{form_end}}
+                                {% endif %}
+                              </div>
+                            </div>
+                      </div><!--END:REPLY-->
+                      {% endif %}
+                </div><!-- Interactions -->
+              </div><!-- 8 col -->
+              <!--Begin Sidebar-->
+              {{ sidebar_main }}
+              <!--END Sidebar-->
+            </div>
+          </div>
+        </div>
+<!--end:myportal_show-->
+{% elsif page == "login" %}
+<!--begin:login-->
+        <!--
+        `7MMF'        .g8""8q.     .g8"""bgd `7MMF'`7MN.   `7MF'
+          MM        .dP'    `YM. .dP'     `M   MM    MMN.    M
+          MM        dM'      `MM dM'       `   MM    M YMb   M
+          MM        MM        MM MM            MM    M  `MN. M
+          MM      , MM.      ,MP MM.    `7MMF' MM    M   `MM.M
+          MM     ,M `Mb.    ,dP' `Mb.     MM   MM    M     YMM
+        .JMMmmmmMMM   `"bmmd"'     `"bmmmdPY .JMML..JML.    YM
+                        BEGIN LOGIN
+                                                           -->
+        <div id="content">
+          <div class="container login">
+            <div class="body row">
+              <div class="col-md-6 col-md-offset-3">
+                <div id="desk-external-variables-myportal_show" class="desk-external-variables hide">
+                  <div id="system-snippets-email_required" class=""><p class="error">{{system.snippets.email_required}}</p></div>
+                  <div id="system-snippets-invalid_email" class="alert hide">{{system.snippets.invalid_email}}</div>
+                  <div id="system-snippets-password_required" class="alert hide">{{system.snippets.password_required}}</div>
+                </div>
+                <div class="panel panel-default form login">
+                  <div class="panel-body">
+                    <h2>{{desk.system.snippets.login_title}}</h2>
+                    {{desk.page.content.form}}
+                  </div>
+                </div>
+                <div class="options">
+                  <ul>
+                    <li class="create"></li>
+                    <li class="reset"></li>
+                  </ul>
+                </div>
+              </div>
+            </div><!-- body.row -->
+          </div><!-- .container.login -->
+        </div><!-- #content -->
+<!--end:login-->
+{% elsif page == "registration" %}
+<!--begin:registration-->
+        <!--
+        `7MM"""Mq.  `7MM"""YMM    .g8"""bgd `7MMF' .M"""bgd MMP""MM""YMM `7MM"""YMM  `7MM"""Mq.
+          MM   `MM.   MM    `7  .dP'     `M   MM  ,MI    "Y P'   MM   `7   MM    `7    MM   `MM.
+          MM   ,M9    MM   d    dM'       `   MM  `MMb.          MM        MM   d      MM   ,M9
+          MMmmdM9     MMmmMM    MM            MM    `YMMNq.      MM        MMmmMM      MMmmdM9
+          MM  YM.     MM   Y  , MM.    `7MMF' MM  .     `MM      MM        MM   Y  ,   MM  YM.
+          MM   `Mb.   MM     ,M `Mb.     MM   MM  Mb     dM      MM        MM     ,M   MM   `Mb.
+        .JMML. .JMM..JMMmmmmMMM   `"bmmmdPY .JMML.P"Ybmmd"     .JMML.    .JMMmmmmMMM .JMML. .JMM.
+                        BEGIN REGISTER
+                                                                                             -->
+        <div id="desk-external-variables-registration" class="desk-external-variables hide">
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+        </div>
+        <div id="content">
+          <div class="container register">
+            <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+                <div id="desk-external-variables-myportal_show" class="desk-external-variables hide">
+                  <div id="system-snippets-email_required" class=""><p class="error">{{system.snippets.email_required}}</p></div>
+                  <div id="system-snippets-invalid_email" class="alert hide">{{system.snippets.invalid_email}}</div>
+                  <div id="system-snippets-password_required" class="alert hide">{{system.snippets.password_required}}</div>
+                </div>
+                <div class="panel panel-default form login">
+                  <div class="panel-body">
+                    <h2>{{desk.system.snippets.registration_title}}</h2>
+                       <div id='form' class='registration-form'>
+                        {{desk.page.content.form}}
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--end:registration-->
+{% elsif page == "forgot_password" %}
+<!--begin:forgot_password-->
+        <!--
+        `7MM"""Mq.   db       .M"""bgd  .M"""bgd `7MMF'     A     `7MF' .g8""8q. `7MM"""Mq.  `7MM"""Yb.
+          MM   `MM. ;MM:     ,MI    "Y ,MI    "Y   `MA     ,MA     ,V .dP'    `YM. MM   `MM.   MM    `Yb.
+          MM   ,M9 ,V^MM.    `MMb.     `MMb.        VM:   ,VVM:   ,V  dM'      `MM MM   ,M9    MM     `Mb
+          MMmmdM9 ,M  `MM      `YMMNq.   `YMMNq.     MM.  M' MM.  M'  MM        MM MMmmdM9     MM      MM
+          MM      AbmmmqMA   .     `MM .     `MM     `MM A'  `MM A'   MM.      ,MP MM  YM.     MM     ,MP
+          MM     A'     VML  Mb     dM Mb     dM      :MM;    :MM;    `Mb.    ,dP' MM   `Mb.   MM    ,dP'
+        .JMML. .AMA.   .AMMA.P"Ybmmd"  P"Ybmmd"        VF      VF       `"bmmd"' .JMML. .JMM..JMMmmmdP'
+                        BEGIN PASSWORD
+                                                                                                        -->
+        <div id="desk-external-variables-forgot_password" class="desk-external-variables hide">
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+        </div>
+        <div id="content">
+          <div class="container password">
+            <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+                <div id="desk-external-variables-myportal_show" class="desk-external-variables hide">
+                  <div id="system-snippets-email_required" class=""><p class="error">{{system.snippets.email_required}}</p></div>
+                  <div id="system-snippets-invalid_email" class="alert hide">{{system.snippets.invalid_email}}</div>
+                  <div id="system-snippets-password_required" class="alert hide">{{system.snippets.password_required}}</div>
+                </div>
+               <div class="panel panel-default form login">
+                  <div class="panel-body">
+                    <h2>{{desk.system.snippets.password_reset_title}}</h2>
+                    {{desk.page.content.form}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--end:forgot_password-->
+{% elsif page == "myaccount" %}
+<!--begin:myaccount-->
+        <!--
+              db       .g8"""bgd   .g8"""bgd   .g8""8q. `7MMF'   `7MF'`7MN.   `7MF'MMP""MM""YMM
+             ;MM:    .dP'     `M .dP'     `M .dP'    `YM. MM       M    MMN.    M  P'   MM   `7
+            ,V^MM.   dM'       ` dM'       ` dM'      `MM MM       M    M YMb   M       MM
+           ,M  `MM   MM          MM          MM        MM MM       M    M  `MN. M       MM
+           AbmmmqMA  MM.         MM.         MM.      ,MP MM       M    M   `MM.M       MM
+          A'     VML `Mb.     ,' `Mb.     ,' `Mb.    ,dP' YM.     ,M    M     YMM       MM
+        .AMA.   .AMMA. `"bmmmd'    `"bmmmd'    `"bmmd"'    `bmmmmd"'  .JML.    YM     .JMML.
+                        BEGIN MY ACCOUNT
+                                                                                              -->
+        <div id="desk-external-variables-myaccount" class="desk-external-variables hide">
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+          <div id="system-snippets-duplicate_email">{{system.snippets.duplicate_email}}</div>
+        </div>
+        <div id="content">
+          <div class="container myportal account">
+            <div class="row">
+              <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
+                <div class="header row">
+                  <div class="col-md-12">
+                    <h2>{{desk.system.snippets.account_title}}</h2>
+                    <a href='{{ desk.system.links.myportal }}'>{{desk.system.snippets.track_support_cases_clickable}}</a>{{desk.system.snippets.track_support_cases}}
+                  </div>
+                </div>
+                <div class="body row">
+                  <div class="col-md-12">
+                    {% unless current_customer.verified? %}
+                      <p class="bg-warning"> {{system.snippets.account_not_verified}} </p>
+                    {% endunless %}
+                    <p>
+                      {% if site.myportal_enabled %}
+
+                      {% else %}
+                        {{system.snippets.verify_email_addresses}}
+                      {% endif %}
+                    </p>
+                    <hr />
+                    <div id='form' class='myaccount-form'>
+                      {{desk.page.content.form}}
+                      <div id="twitterAdd"></div>
+                      <div id="facebookAdd"></div>
+                    </div>
+                  </div>
+                </div>
+              </div><!--END ACCOUNT-->
+              <!--Begin Sidebar-->
+              {{ sidebar_main }}
+              <!--END Sidebar-->
+            </div>
+          </div>
+        </div>
+<!--end:myaccount-->
+{% elsif page == "authentication_verification" %}
+<!--begin:authentication_verification-->
+
+        <!--
+              db       .g8"""bgd   .g8"""bgd   .g8""8q. `7MMF'   `7MF'`7MN.   `7MF'MMP""MM""YMM
+             ;MM:    .dP'     `M .dP'     `M .dP'    `YM. MM       M    MMN.    M  P'   MM   `7
+            ,V^MM.   dM'       ` dM'       ` dM'      `MM MM       M    M YMb   M       MM
+           ,M  `MM   MM          MM          MM        MM MM       M    M  `MN. M       MM
+           AbmmmqMA  MM.         MM.         MM.      ,MP MM       M    M   `MM.M       MM
+          A'     VML `Mb.     ,' `Mb.     ,' `Mb.    ,dP' YM.     ,M    M     YMM       MM
+        .AMA.   .AMMA. `"bmmmd'    `"bmmmd'    `"bmmd"'    `bmmmmd"'  .JML.    YM     .JMML.
+                        BEGIN VERIFICATION
+                                                                                              -->
+        <div id="desk-external-variables-authentication_verification" class="desk-external-variables">
+          <div id="system-snippets-email_required">{{system.snippets.email_required}}</div>
+          <div id="system-snippets-invalid_email">{{system.snippets.invalid_email}}</div>
+        </div>
+        <div id="notifications">
+        </div>
+        <div id="content">
+          <div class="container account">
+            <div class="header row">
+              <div class="col-md-12">
+                <h3 class="verify-title">{{desk.system.snippets.auth_verification_title}}</h3>
+
+                <div id="verification_step_1">
+                  <div id='form' class='authentication_verification-form'>
+                    {{desk.page.content.form}}
+                  </div>
+                  <div id="authentication-verification-copy">
+                    <p>{{desk.system.snippets.authentication_verification_msg}}{% if twitter_screen_name != nil %} @{{twitter_screen_name}}{% endif %}!</p>
+                    <p>{{desk.system.snippets.authentication_verification_note}}</p>
+                  </div>
+                </div>
+                <div id="verification_step_2">
+                  <p>{{verification_initiation_success}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--end:authentication_verification-->
+{% elsif page == "customer_feedback" %}
+<!--begin:customer_feedback-->
+        <div id="desk-external-variables-customer-feedback" class="desk-external-variables"></div>
+        <div id="content">
+          <div class="container feedback main-customer-feedback">
+            <div class="row">
+              <div class="col-md-6 col-md-offset-3">
+                <div class="panel panel-default form" id="form">
+                {% if customer_feedback.feedback_enabled? %}
+                    <div class="panel-heading">
+                        <h2>{{desk.system.snippets.customer_feedback_title}}</h2>
+                        <h4>{{desk.system.snippets.customer_feedback_case}}</h4>
+                        <h6 class="subheader">{{desk.system.snippets.case_id}}: {{ticket.id}}!</h6>
+                    </div>
+                    {% form customer_feedback %}
+                      <div class="panel-body">
+                        <label for="" class="control-label">{{customer_feedback.question}}</label>
+                        <input id="customer-feedback-checked-rating" type="hidden" name="checked_rating" value="{{customer_feedback.rating}}">
+                        {% if customer_feedback.yes_no_rating? %}
+                          <div class="row two-up">
+                            <div class="col-xs-3">
+                              <div class="form-group">
+                                <input id="customer-feedback-rating0" class="" name="customer_feedback[rating]" type="radio" value="0">
+                                <button type="button" class="btn btn-primary btn-radio value-0">
+                                  <img class="radio-label-rating-type" src='{{ "/images/rating_type100_0.png" | portal_image_url: image_asset_host }}'>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="col-xs-3">
+                              <div class="form-group">
+                                <input id="customer-feedback-rating1" class="" name="customer_feedback[rating]" type="radio" value="3">
+                                <button type="button" class="btn btn-primary btn-radio value-3">
+                                 <img class="radio-label-rating-type" src='{{ "/images/rating_type100_3.png" | portal_image_url: image_asset_host }}'>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        {% else %}
+                          <div class="row four-up">
+                            <div class="col-xs-3">
+                                <div class="form-group">
+                                  <input id="customer-feedback-rating0" class="" name="customer_feedback[rating]" type="radio" value="0">
+                                  <button type="button" class="btn btn-primary btn-radio value-0">
+                                    <img class="radio-label-rating-type" src='{{ "/images/rating_type200_0.png" | portal_image_url: image_asset_host }}'>
+                                  </button>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                              <div class="form-group">
+                                <input id="customer-feedback-rating1" class="" name="customer_feedback[rating]" type="radio" value="1">
+                                <button type="button" class="btn btn-primary btn-radio value-1">
+                                  <img class="radio-label-rating-type" src='{{ "/images/rating_type200_1.png" | portal_image_url: image_asset_host }}'>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="col-xs-3">
+                              <div class="form-group">
+                                <input id="customer-feedback-rating2" class="" name="customer_feedback[rating]" type="radio" value="2">
+                                <button type="button" class="btn btn-primary btn-radio value-2">
+                                   <img class="radio-label-rating-type" src='{{ "/images/rating_type200_2.png" | portal_image_url: image_asset_host }}'>
+                                </button>
+                              </div>
+                            </div>
+                            <div class="col-xs-3">
+                              <div class="form-group">
+                                <input id="customer-feedback-rating3" class="" name="customer_feedback[rating]" type="radio" value="3">
+                                <button type="button" class="btn btn-primary btn-radio value-3">
+                                  <img class="radio-label-rating-type" src='{{ "/images/rating_type200_3.png" | portal_image_url: image_asset_host }}'>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        {% endif %}
+                        {% if customer_feedback.additional_feedback_enabled? %}
+                          <div class="form-group input-block">
+                              <label class="control-label">{{customer_feedback.additional_question}}</label>
+                              <textarea name='customer_feedback[additional_feedback]' class="form-control" maxlength="1024">{{customer_feedback.additional_feedback}}</textarea>
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="panel-footer">
+                        <div class='input-button'>
+                          <input id='customer-feedback-submit' name='commit' type='submit' value='submit' />
+                        </div>
+                      </div>
+                    {% endform %}
+                {% else %}
+                      <div class="panel-body feedback-disabled">
+                        {{system.snippets.customer_feedback_disabled}}
+                      </div>
+                {% endif %}
+                </div>
+              </div>
+            </div><!--ROw-->
+          </div><!--CONTAINER-->
+        </div><!--#CONTENT-->
+      <script type="text/javascript" src="{{desk_javascript_host}}portal/desk.portal.body.customer_feedback.js"></script>
+<!--end:customer_feedback-->
+{% elsif page == "customer_feedback_completed" %}
+<!--begin:customer_feedback_completed-->
+  <div id="content">
+    <div class="container feedback">
+      <div class="row">
+              <h3>{{desk.system.snippets.customer_feedback_completed}}</h3>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript" src="{{desk_javascript_host}}portal/desk.portal.body.customer_feedback.js"></script>
+<!--end:customer_feedback_completed-->
+{%endif%}
+<!--end:portal_body-->
+
+  </div> <!-- END CONTENT -->
+</div> <!-- Wrapper -->
+<div id="footer">
+  <div class="container">
+      <div class="row">
+        {{ desk.page.theme.footer_content }}
+      </div>
+      <div class="row attribution">
+        <div class="col-md-12">
+          <!--
+          ***************
+          The following attribution needs to remain as is in terms of wording with the appropriate link back to desk.com as per our terms of service: http://www.desk.com/terms
+          If you would like, you may change the location or the styling to better match your site, but the content and the link must remain in the template and visible to end users.
+          ****************
+          -->
+          <div id="desk-attribution"><a href="http://www.desk.com/">Customer service software <span>powered by Desk.com</span></a></div>
+        </div>
+      </div>
+  </div>
+</div><!-- #desk-footer -->
+<!-- Facebook Like Button -->
+<div id="fb-root"></div>
+<!-- External Variables for Portal Header -->
+<div id="desk-external-variables-header" class="desk-external-variables" style="display:none;">
+  <div id="system_language">{{system.language}}</div>
+  <div id="results_mobile">{{system.snippets.results_found_for | replace: 'for', '' }}</div>
+  <div id="read_only">{{read_only}}</div>
+  <div id="system-snippets-do_these_help">{{system.snippets.do_these_help}}</div>
+  <div id="site-default_mailbox">{{site.default_mailbox}}</div>
+  <div id="desk_javascript_host">{{desk_javascript_host}}</div>
+  <div id="twitter_enabled">{{desk.apps.twitter.enabled}}</div>
+  <div id="twitter_username">{{desk.apps.twitter.username}}</div>
+  <div id="system-snippets-loading">{{system.snippets.loading}}</div>
+  <div id="system-snippets-seconds_ago">{{system.snippets.seconds_ago}}</div>
+  <div id="system-snippets-a_minute_ago">{{system.snippets.a_minute_ago}}</div>
+  <div id="system-snippets-minutes_ago">{{system.snippets.minutes_ago}}</div>
+  <div id="system-snippets-an_hour_ago">{{system.snippets.an_hour_ago}}</div>
+  <div id="system-snippets-hours_ago">{{system.snippets.hours_ago}}</div>
+  <div id="system-snippets-a_day_ago">{{system.snippets.a_day_ago}}</div>
+  <div id="system-snippets-days_ago">{{system.snippets.days_ago}}</div>
+  <div id="system-snippets-about">{{system.snippets.about}}</div>
+  <div id="enable_gs">{{desk.apps.get_satisfaction.enabled}}</div>
+  <div id="system-snippets-invalid_characters_found">{{system.snippets.invalid_characters_found}}</div>
+  <div id="site-search_autocomplete_articles_url">{{site.search_autocomplete_articles_url}}</div>
+  <div id="search-term">{{search_term}}</div>
+  {% if desk.apps.get_satisfaction.enabled %}
+    <div id="system-snippets-get_satisfaction_error">{{system.snippets.get_satisfaction_error}}</div>
+    <div id="system-snippets-view_all">{{system.snippets.view_all}}</div>
+    <div id="system-snippets-no_related_discussions">{{system.snippets.no_related_discussions}}</div>
+    <div id="system-snippets-related_discussions">{{system.snippets.related_discussions}}</div>
+    <div id="zero0">{{0}}</div>
+    <div id="system-snippets-discussions">{{system.snippets.discussions}}</div>
+    <div id="system-snippets-replies">{{system.snippets.replies}}</div>
+    <div id="system-snippets-questions">{{system.snippets.questions}}</div>
+    <div id="system-snippets-ideas">{{system.snippets.ideas}}</div>
+    <div id="system-snippets-problems">{{system.snippets.problems}}</div>
+    <div id="system-snippets-praise">{{system.snippets.praise}}</div>
+  {% endif %}
+</div>
+<div id="ThemeOptions" class="hidden" style="display:none;">
+  <div id="header_text">{{desk.page.theme.hdr-text-color}}</div>
+  <div id="current-page">{{ page }}</div>
+  <div id="brand_id">{{ desk.current_brand.id }}</div>
+  <div id="site-brands">
+    {% for brand in desk.brands %}
+       <div id="{{brand.id}}">{{brand.name}}</div>
+    {% endfor %}
+  </div>
+  {% if SkipPreCreate == true %}
+    <div id="SkipPreCreate">true</div>
+  {% endif %}
+  {% if MBSearchPage == true %}
+    <div id="MBSearchPage">true</div>
+    <div id="results-count">{{ number_search_results }}</div>
+  {% endif %}
+  {% if MBSearchSuggest == true %}
+    <div id="MBSearchSuggest">true</div>
+  {% endif %}
+  {% if MBArticleSuggest == true %}
+    <div id="MBArticleSuggest">true</div>
+  {% endif %}
+</div>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="//desk-customers.s3.amazonaws.com/v10/js/desk.portal.js" type="text/javascript"></script>
