@@ -49,75 +49,7 @@
                   </h2>
                 </div>
                 <!-- INDEX PAGE LAYOUT CHANGE FUNCTIONALITY -->
-                {% if IndexLayout == 'List' %}
-                <!-- TOPICS LIST VIEW -->
-                    {%for topic in topics%}
-                      {% if topic.article_count > 0 %}
-                        <div class="row topic">
-                          <div class="desk-topic desk-topic-{{ topic.id }} col-md-12 list">
-                            <h3>
-                               <a href='{{ topic.public_articles_url }}'>{{ topic.name }}</a>
-                            </h3>
-                            <ul>
-                              {% for article in topic.articles limit:5 %}
-                              <li>
-                                <h4><a href='{{ article.public_url }}'>{{ article.subject_plain }}</a></h4>
-                                <p>{{ article.body_plain | clip:210 }}</p>
-                              </li>
-                              {% endfor %}
-                            </ul>
-                            <a href='{{ topic.public_articles_url }}' class="btn btn-pill"><span class="desk-view-text">{{system.snippets.view_all}} </span>
-                              {{ topic.article_count }}
-                            </a>
-                          </div>
-                        </div>
-                      {%endif%}
-                    {%endfor%}
-                  <!-- END TOPICS LIST VIEW -->
-                  <!-- QUESTIONS LIST VIEW -->
-                  {% if site.questions_enabled_config %}
-                      <!-- DO QUESTIONS EXIST -->
-                      {%for topic in topics %}
-                          {% if topic.question_count > 0 %}
-                              {% assign questions = true %}
-                          {% endif %}
-                      {% endfor %}
-                      <!-- END QUESTION CHECK -->
-                    <div class="row header">
-                        <h2 class="subheader col-md-12">
-                          {% if questions == true %}
-                            {{system.snippets.recent_qna}}
-                          {% endif %}
-                        </h2>
-                    </div>
-                    {% if topics_count > 0 %}
-                      {%for topic in topics%}
-                        {% if topic.question_count > 0 %}
-                          <div class="row topic">
-                            <div class="desk-qna desk-qna-{{ topic.id }} col-md-12 list">
-                              <h3><a href='{{ topic.public_articles_url }}'>{{ topic.name }}</a></h3>
-                              <ul>
-                                {% for question in topic.questions limit:5 %}
-                                <li class='desk-question {% if question.featured? %} featured{%endif%}'>
-                                  <a href='{{ question.public_url }}'>{{ question.subject_plain }}</a>
-                                  <p>{{ question.body_plain | clip:210 }}</p>
-                                </li>
-                                {% endfor %}
-                              </ul>
-
-                              <a href='{{ topic.public_questions_url  }}' class="btn btn-pill"><span class="desk-view-text">{{system.snippets.view_all}} </span>
-                                {{ topic.question_count }}
-                                {{ system.snippets.community_discussions | pluralize: topic.question_count, system.snippets.questions }}
-                              </a>
-                            </div>
-                          </div>
-                        {%endif%}
-                      {%endfor%}
-                    {% endif %}
-                  {%endif%}
-                  <!-- END QUESTIONS LIST VIEW -->
-                <!--END LIST VIEW -->
-                {% elsif IndexLayout == "Grid" %}
+                {% if IndexLayout == "Grid" %}
                 <!--START GRID VIEW (DEFAULT) -->
                   <!-- ARTICLES GRID VIEW -->
                   <div class="row topic">
@@ -216,40 +148,6 @@
                   </div>
                 <!--END TOPICS ONLY VIEW -->
                 {% endif %}
-                <!-- GET SAT -->
-                {% if desk.apps.get_satisfaction.enabled %}
-                    <div class="row header">
-                      <h2 class="col-md-12">
-                        {{system.snippets.community_discussions}}
-                      </h2>
-                    </div>
-                    <div class="row get-sat">
-                      <div class="col-md-6">
-                        <div id="gs_questions">
-                          <img alt='Ajax-loader-small' id='question_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display:block;margin:auto;' />
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div id="gs_ideas">
-                          <img alt='Ajax-loader-small' id='question_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display:block;margin:auto;' />
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row get-sat">
-                      <div class="col-md-6">
-                        <div id="gs_problems">
-                          <img alt='Ajax-loader-small' id='question_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display:block;margin:auto;' />
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div id="gs_praises">
-                          <img alt='Ajax-loader-small' id='question_submit_spinner' src='{{ "/images/ajax-loader-small.gif" | portal_image_url: image_asset_host }}' style='display:block;margin:auto;' />
-                        </div>
-                      </div>
-                    </div>
-                    {{gs_scripting}}
-                {% endif %}
-                <!-- GET SAT -->
               </div><!--Index Col 8 -->
               <!--SIDEBAR -->
                 {% if IndexLayout != "Topics" %}
