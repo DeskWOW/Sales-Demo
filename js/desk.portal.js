@@ -451,7 +451,7 @@ var SkipPreCreate = deskEV('SkipPreCreate');
     //MODAL/POPUP
     $('#PreCreate').appendTo("body").modal('show');
     //SKIP PRECREATE
-    if (SkipPreCreate = 'true') {
+    if (SkipPreCreate == 'true') {
       $('#new_email').attr('action','/customer/portal/emails');
       $('#new_chat').attr('action','/customer/portal/chats');
       $('#new_question').attr('action','/customer/portal/questions');
