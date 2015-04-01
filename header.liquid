@@ -74,9 +74,9 @@
                   **** STYLE SHEETS FONTS AND MORE ****
     /////////////////////////////////////////////////////////////// -->
 
-<link rel="stylesheet" href="//desk-customers.s3.amazonaws.com/v10/css/bootstrap.min.css">
+<link rel="stylesheet" href="//desk-customers.s3.amazonaws.com/sedemo/css/bootstrap.min.css">
 <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-<link href="//desk-customers.s3.amazonaws.com/v10/css/default.css" rel="stylesheet">
+<link href="//desk-customers.s3.amazonaws.com/sedemo/css/default.css" rel="stylesheet">
 <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,600,400,300,700,800" rel='stylesheet' type='text/css'>
  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -86,15 +86,7 @@
 <![endif]-->
 
 
-<!-- LOGO WIDTH TESTING -->
-{% if desk.page.theme.logo-img != "" %}
-  {% assign logowidth = desk.page.theme.logo-img-width | plus: 0 %}
-  {% if logowidth > 300 %}
-    {% assign widelogo = true %}
-  {% else %}
-   {% assign widelogo = false %}
-  {% endif %}
-{% endif %}
+
 
 <style>
     {% if desk.page.theme.logo-img != "" %}
@@ -103,15 +95,13 @@
         display: inline-block;
         min-width: 100%;
         background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
-        background-size: {{ desk.page.theme.logo-img-width | divided_by:1}}px {{desk.page.theme.logo-img-height | divided_by:1}}px;
-        height: {{desk.page.theme.logo-img-height | divided_by:1}}px;
-        padding-left: {{ desk.page.theme.logo-img-width | plus:24}}px;
-        line-height: {{desk.page.theme.logo-img-height}}px;
-        {% if  logowidth > 300 %}
+        background-size: {{ desk.page.theme.logo-img-width | divided_by:2 }}px {{ desk.page.theme.logo-img-height | divided_by:2}}px;
+        height: {{desk.page.theme.logo-img-height | divided_by:2}}px;
+        padding-left: 0px;
+        line-height: {{desk.page.theme.logo-img-height | divided_by:2 }}px;
         text-indent: -9999px;
-        {% endif %}
       }
-      {% if widelogo = false %}
+
       #mobile-menu .brand .logo{
         text-indent: -9999px;
         display: block;
@@ -121,21 +111,13 @@
         height: {{desk.page.theme.logo-img-height | divided_by: 1}}px;
         width: {{ desk.page.theme.logo-img-width | divided_by: 1}}px;
       }
-      {% endif %}
       /* ADJUST MENU FOR SUPER WIDE LOGO/BANNER IMAGE */
-      {% if widelogo = true %}
-        #header .container {padding: 15px;}
-        #header ul.nav.nav-pills {
-          height: auto;
-          padding-top: 15px;
-        }
-      {% else %}
-        #header ul.nav.nav-pills {
-          height: {{desk.page.theme.logo-img-height}}px;
-          padding-top: {{desk.page.theme.logo-img-height | divided_by: 3}}px;
-        }
-      {% endif %}
-    {% endif %}
 
+    {% endif %}
+    #header {
+      background: url({{ desk.current_brand.logo }}) no-repeat;
+      background-size: cover;
+      background-position: center center;
+    }
     {{ desk.page.theme.custom_css }}
 </style>
