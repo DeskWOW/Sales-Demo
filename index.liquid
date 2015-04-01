@@ -12,11 +12,7 @@
         <div id="content">
           <div class="container index">
             <div class="row">
-            {% if IndexLayout == "Topics" %}
-              <div class="col-md-12 centered">
-            {% else %}
               <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
-            {% endif %}
                 <div id="desk-external-variables-page_index" class="desk-external-variables">
                   <div id="system-snippets-just_moderated">{{just_moderated}}</div>
                 </div>
@@ -132,17 +128,11 @@
                 <!--START TOPICS ONLY VIEW -->
                   <div class="row topics-only">
                     {% assign col = 0 %}
-                    {%for topic in topics%}
+                    {%for topic in topics %}
                       {% if topic.article_count > 0 %}
-                          <div class="desk-topic desk-topic-{{ topic.id }} col-md-6">
-                               <a href='{{ topic.public_articles_url }}' class="btn btn-primary">{{ topic.name }} <span>{{ topic.article_count }}</span></a>
-                          </div>
-                          {% if col == 2 %}
-                            </div><div class="row topics-only">
-                            {%assign col = 0 %}
-                          {%else%}
-                            {% assign col = 2 %}
-                          {%endif%}
+                        <div class="desk-topic desk-topic-{{ topic.id }} col-md-4 col-sm-6 col-xs-12">
+                             <a href='{{ topic.public_articles_url }}' class="btn btn-primary">{{ topic.name }} <span>{{ topic.article_count }}</span></a>
+                        </div>
                       {%endif%}
                     {%endfor%}
                   </div>
@@ -150,9 +140,7 @@
                 {% endif %}
               </div><!--Index Col 8 -->
               <!--SIDEBAR -->
-                {% if IndexLayout != "Topics" %}
                   {{ sidebar_main }}
-                {% endif %}
               <!--SIDEBAR -->
             </div><!-- Main Row-->
           </div><!--Container-->

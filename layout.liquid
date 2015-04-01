@@ -208,7 +208,7 @@
     <div id="header">
       <div class="container">
 
-        <div class="col-md-3">
+        <div class="col-md-2 nopad">
             {% if desk.page.theme.header_content == "" %}
             <h1>
               <a href='/'>
@@ -223,8 +223,27 @@
               {{ desk.page.theme.header_content }}
             {% endif %}
         </div>
-        <div class="col-md-6">search</div>
-        <div class="col-md-3">
+        <div class="col-md-8">
+          <!-- SEARCH -->
+          <div id="search" class="hidden-phone">
+              <div class="row">
+                {{ search_form_begin }}
+                <div class="col-md-12">
+                  {{template_form_params}}
+                  {% if MBSearchSuggest == true %}
+                    <input type="text" id="qMB" name="q" maxlength="100" value="" placeholder="{{system.snippets.have_a_question}}" class="input form-control" autocomplete="off" />
+                  {% else %}
+                    <input type="text" id="q" name="q" maxlength="100" value="" placeholder="{{system.snippets.have_a_question}}" class="input form-control" />
+                  {% endif %}
+                    <button type="submit" class="" id="support-search-submit" value="{{system.snippets.search}}">{{system.snippets.search}}</button>
+                </div>
+                {{ search_form_end }}
+              </div>
+          </div><!-- #search -->
+          <div id="SearchAutoSuggest" class="ui-multi-brand"></div>
+          <!-- END SEARCH -->
+        </div>
+        <div class="col-md-2">
           <ul class="nav nav-pills">
             {% if current_user and current_user.is_guest == true %}
              {% if langs_list %}
@@ -343,28 +362,7 @@
       <!-- END BREADCRUMBS -->
     </div><!-- #header -->
 
-    <!-- SEARCH -->
-    {% if page == "myportal_index" or page == "myaccount" or page == "login" or page == "registration" or page == "authentication_verification" or page == "forgot_password" or page == "authentication_verification" %} {% else %}
-        <div id="search" class="hidden-phone">
-          <div class="container">
-            <div class="row">
-              {{ search_form_begin }}
-              <div class="col-md-12">
-                {{template_form_params}}
-                {% if MBSearchSuggest == true %}
-                  <input type="text" id="qMB" name="q" maxlength="100" value="" placeholder="{{system.snippets.have_a_question}}" class="input form-control" autocomplete="off" />
-                {% else %}
-                  <input type="text" id="q" name="q" maxlength="100" value="" placeholder="{{system.snippets.have_a_question}}" class="input form-control" />
-                {% endif %}
-                  <button type="submit" class="fa fa-search" id="support-search-submit" value="{{system.snippets.search}}"></button>
-              </div>
-              {{ search_form_end }}
-            </div>
-          </div><!-- Search Container -->
-        </div><!-- #desk-search -->
-        <div id="SearchAutoSuggest" class="ui-multi-brand"></div>
-    {% endif %}
-    <!-- END SEARCH -->
+
     {{desk:body}}
 
   </div> <!-- END CONTENT -->
