@@ -131,7 +131,13 @@
                     {%for topic in topics %}
                       {% if topic.article_count > 0 %}
                         <div class="desk-topic desk-topic-{{ topic.id }} col-md-4 col-sm-6 col-xs-12">
-                             <a href='{{ topic.public_articles_url }}' class="btn btn-primary">{{ topic.name }} <span>{{ topic.article_count }}</span></a>
+                          {% if topic.desc contains '//' %}
+                            <a href='{{ topic.public_articles_url }}' class="topic-button"  style="background: url({{ topic.desc }}); background-size: cover;">
+                          {% else %}
+                            <a href='{{ topic.public_articles_url }}' class="topic-button">
+                          {% endif %}
+                             <span>{{ topic.name }}</span>
+                            </a>
                         </div>
                       {%endif%}
                     {%endfor%}
