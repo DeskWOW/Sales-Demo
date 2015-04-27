@@ -44,7 +44,7 @@
                     <article class="row result article">
                       <div class="col-md-12">
                         <h3>
-                          <a href='{{ result.public_url }}' title="{{ result.subject_plain }}">{{ result.subject_plain }}</a>
+                          <a href='{{ result.public_url }}' title="{{ result.subject_plain }}"><span>{{ result.subject_plain }}</span></a>
                         </h3>
                         {% if MBSearchPage == true %}<label class="{{desk.current_brand.name}}">{{desk.current_brand.name}}</label>{% endif %}
                         <p>{{ result.body_plain | clip:210 }}</p>
@@ -60,7 +60,7 @@
                       </div>
                       <div class="col-md-11">
                         <h3>
-                          <a href='{{ result.public_url }}' title="{{ result.subject_plain }}">{{ result.subject_plain }}</a>
+                          <a href='{{ result.public_url }}' title="{{ result.subject_plain }}"><span>{{ result.subject_plain }}</span></a>
                         </h3>
                         {% if MBSearchPage == true %}<label class="{{desk.current_brand.name}}">{{desk.current_brand.name}}</label>{% endif %}
                         <p>{{ result.body_plain | clip:210 }}</p>
