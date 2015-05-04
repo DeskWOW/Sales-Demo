@@ -537,12 +537,15 @@ INDEX PAGE ------
   #content .container.index {
     padding: 84px 15px 130px 15px;
   }
-  #content .container.index .header h2{
-    margin-bottom: 40px;
+  #content .container.index .header h1{
+    margin-bottom: 10px;
     font-weight: 700;
-  }
-  #content .container.index .centered .header h2 {
     text-align: center;
+  }
+  #content .container.index .header h4{
+    text-align: center;
+    font-weight: 300;
+    margin-bottom: 40px;
   }
   #content .container.index .desk-topic,
   #content .container.index .desk-qna,
