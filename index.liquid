@@ -9,13 +9,23 @@
         .JMML..JML.    YM  .JMMmmmdP' .JMMmmmmMMM .MM:.  .:MMa.
                       START INDEX PAGE
                                                             -->
+        <div id="desk-external-variables-page_index" class="desk-external-variables">
+          <div id="system-snippets-just_moderated">{{just_moderated}}</div>
+        </div>
         <div id="content">
           <div class="container index">
+            <div class="row header">
+              <div class="col-md-12">
+                {% if topics_count > 0 %}
+                    <h1>{{ system.snippets.welcome }}</h1>
+                    <h4>{{ system.snippets.welcome_message }}</h4>
+                {% else %}
+                   <h1>{{system.snippets.no_topics_avail}}</h1>
+                {% endif %}
+              </div>
+            </div>
             <div class="row">
               <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
-                <div id="desk-external-variables-page_index" class="desk-external-variables">
-                  <div id="system-snippets-just_moderated">{{just_moderated}}</div>
-                </div>
                 <div class="row header">
                   {% if just_moderated %}
                     <div id="modal-screen">&nbsp;</div>
@@ -36,13 +46,6 @@
                       </div>
                     </div>
                   {% endif %}
-                  <h2 class="subheader col-md-12">
-                    {% if topics_count > 0 %}
-                        {{system.snippets.browse_by_topic}}
-                    {% else %}
-                        {{system.snippets.no_topics_avail}}
-                    {% endif %}
-                  </h2>
                 </div>
                 <!-- INDEX PAGE LAYOUT CHANGE FUNCTIONALITY -->
                 {% if IndexLayout == "Grid" %}
