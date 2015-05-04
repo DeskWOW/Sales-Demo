@@ -16,12 +16,7 @@
           <div id="content">
             <div class="container myportal index">
               <div class="row">
-                <!-- FULL WIDTH IF COMPANY CASES ARE ENDABLED  -->
-                {% if desk.customer.can_access_company_tickets? %}
                 <div class="col-md-12">
-                {% else %}
-                <div class="col-md-8 {% if desk.page.theme.layout != 'left' %} col-md-push-4 {% endif %}">
-                {% endif %}
                   <div class="header row">
                     <div class="col-md-12">
                       <!-- <h2>{{desk.system.snippets.my_cases}}</h2> -->
@@ -97,12 +92,7 @@
                     </div>
                   </div><!-- .row -->
                 </div>
-                <!-- ONLY SHOW SIDEBAR IF COMPANY CASES IS DISABLED -->
-                {% if desk.customer.can_access_company_tickets? %} {% else %}
-                <!--Begin Sidebar-->
-                {{ sidebar_main }}
-                <!--END Sidebar-->
-                {% endif %}
+
               </div><!-- .row-->
             </div><!-- .portal-->
           </div><!-- #content -->

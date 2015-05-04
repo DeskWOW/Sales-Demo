@@ -63,6 +63,7 @@
     <!-- END MAIN SIDEBAR -->
 {% endcapture %}
 
+
 {% capture sidebar_suggest %}
     <!-- BEGIN AUTO SUGGEST SIDEBAR -->
     <div id="sidebar" class="sidebar suggest col-md-4 {% if desk.page.theme.layout != 'left' %}left col-md-pull-8 {% endif %}">
@@ -86,7 +87,7 @@
     <div id="header">
       <div class="container">
         <div class="row">
-          <div class="col-md-2">
+          <div class="col-md-2 col-xs-2">
               {% if desk.page.theme.header_content == "" %}
               <h1>
                 <a href='/'>
@@ -101,7 +102,7 @@
                 {{ desk.page.theme.header_content }}
               {% endif %}
           </div>
-          <div class="col-md-8">
+          <div class="col-md-8 col-xs-8">
             <!-- SEARCH -->
             <div id="search" class="hidden-phone">
                 <div class="row">
@@ -121,7 +122,7 @@
             <div id="SearchAutoSuggest" class="ui-multi-brand"></div>
             <!-- END SEARCH -->
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2 col-xs-2">
             <ul class="menu">
               {% if current_user and current_user.is_guest == true %}
                {% if langs_list %}
@@ -133,23 +134,37 @@
               {% if site.portal_authentication_enabled_config %}
                 <!-- Guest -->
                 {% if current_user and current_user.is_guest == true  and page != "login" %}
-                  <li>
-                    <a href="{{ site.authentication_login_url }}" id="desk-auth-login-link" class="">{{system.snippets.login}}</a>
-                  </li>
+                  <li><a href="{{ site.authentication_login_url }}" id="desk-auth-login-link" class="">{{ current_user.customer.email | gravatar_image: gravatar_unknown_user, ssl }}</a></li>
+                  <li class="login"><a href="{{ site.authentication_login_url }}" id="desk-auth-login-link" class="">{{system.snippets.login}}</a></li>
                 {% endif %}
                 <!-- Logged In -->
                 {% if current_user and current_user.is_guest == false %}
-                    <li><a href="{{ desk.system.links.myaccount }}">{{ current_user.customer.email | gravatar_image: gravatar_unknown_user, ssl }}</a></li>
-                  {% if site.myportal_enabled %}
-                    <li>
-                      <a href="{{ desk.system.links.myportal }}"><i class="fa fa-file-text-o"></i></a>
-                    </li>
-                  {% endif %}
-                  {% if site.portal_logout_enabled_config %}
-                    <li>
-                      <a href="{{ site.authentication_logout_url }}" id="desk-logout-link"><i class="fa fa-sign-out"></i></a>
-                    </li>
-                  {% endif %}
+                  <li>
+                    <div class="btn-group">
+                      <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        {{ current_user.customer.email | gravatar_image: gravatar_unknown_user, ssl }} <i class="fa fa-angle-down"></i>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                        {% if site.myportal_enabled %}
+                          <li>
+                            <a href="{{ desk.system.links.myportal }}">{{system.snippets.my_cases}} <i class="fa fa-inbox"></i></a>
+                          </li>
+                        {% endif %}
+
+                        {% if site.portal_authentication_type_config == 'desk' %}
+                          <li>
+                            <a href="{{ desk.system.links.myaccount }}" id="desk-myaccount-link">{{system.snippets.my_account}} <i class="fa fa-user"></i></a>
+                          </li>
+                        {% endif %}
+
+                        {% if site.portal_logout_enabled_config %}
+                          <li>
+                            <a href="{{ site.authentication_logout_url }}" id="desk-logout-link">{{system.snippets.logout}} <i class="fa fa-sign-out"></i></a>
+                          </li>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </li>
                 {% endif %}
               {% endif %}
             </ul>
@@ -239,7 +254,36 @@
 
 
     {{desk:body}}
-
+    <div id="sub-footer">
+      <div class="container">
+        <div class="row">
+          <h2>
+            {{system.snippets.contact_us}}
+          </h2>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <ul class="contact">
+              {% if site.email_enabled_config %}
+                <li>
+                  <a href='{{desk.system.links.email}}' class="button primary">{{system.snippets.email_us}}</a>
+                </li>
+              {% endif %}
+              {% if site.chat_enabled_config %}
+                <li>
+                  <a href='{{desk.system.links.chat}}' class="button primary">{{system.snippets.live_chat}}</a>
+                </li>
+              {% endif %}
+              {% if site.questions_enabled_config %}
+                <li>
+                  <a href='{{desk.system.links.question}}' class="button primary">{{system.snippets.post_public_question}}</a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="footer">
       <div class="container">
           <div class="row">

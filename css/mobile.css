@@ -1,0 +1,70 @@
+/*=====================================================
+=            Bootstrap 2.3.2 Media Queries            =
+=====================================================*/
+#mobileHeader {display: none;}
+@media only screen and (max-width : 1200px) {
+  #mobileHeader {display: none;}
+}
+@media only screen and (max-width : 990px) {
+    #mobileHeader {display: block;}
+    #header h1 a {margin: 0px auto;}
+    #sidebar {margin-top: 50px;}
+    #header ul.menu {margin: 30px auto;float: left;}
+}
+@media only screen and (max-width : 800px) {
+    #header ul.menu {margin: 0px;float: right;}
+    #header ul.menu li{float: right;}
+    #header ul.menu li button i{display:none;}
+    #header ul.menu li.login{display:none;}
+    #header .container {padding: 20px 15px;}
+    #breadcrumbs > .container {padding: 0px 15px;}
+    #header ul.menu li img.gravatar {width: 30px; height: 30px;margin-top: 10px;}
+    #search #support-search-submit {display:none;}
+    #search input.form-control {font-size: 14px; border-radius: 24px;}
+    #mobileHeader {display: block;}
+    #sidebar {margin-top: 50px;}
+    #content .container.myportal.index {padding-top: 20px;}
+    .myportal.index .header ul.case-menu li {width: 100%;margin-bottom: 10px;}
+    .myportal.index .header ul.case-menu li.new a.button {display: inline-block; width: 100%;}
+}
+@media only screen and (max-width : 480px) {
+    #content .container.index .topics-only .desk-topic a.topic-button {font-size: 18px;}
+    #content .container .header h2 {text-align: center;}
+    #sidebar {display:none;}
+    #sub-footer ul.contact li {width: 100%; margin: 15px 0px;}
+    #mobileHeader {display: block;}
+    #mobileHeader select {padding: 10px 15px;}
+    #content .gravatar {display: none;}
+    #mobile-menu .gravatar {display: block;}
+    #content .container.index .desk-topic ul,
+    #content .container.index .desk-qna ul{
+      list-style: none;
+      padding: 0px;
+    }
+    #content .container.index .desk-topic ul li,
+    #content .container.index .desk-qna ul li {
+      width: 100%;
+      margin-bottom: 0px;
+      padding: 15px;
+      border-bottom: 1px solid #efefef;
+    }
+    #content .container.index .desk-topic ul li a,
+    #content .container.index .desk-qna ul li a{
+      display: inline-block;
+      width: 100%;
+    }
+    #content .container.index a.desk-topic-view-all {
+      float: right;
+    }
+    div.options ul li,
+    .alternatelogins > div {
+      width: 100%;
+      margin: 5px auto;
+    }
+    .new_customer_contact_email input {
+      max-width: 75%;
+    }
+    .myportal.case .status .stats {padding: 0px 15px;}
+    .myportal.case .status button, .myportal.case .status input[type="submit"] {width: 100%; display: inline-block; margin-top: 15px;}
+}
+}
