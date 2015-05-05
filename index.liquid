@@ -17,8 +17,13 @@
             <div class="row header">
               <div class="col-md-12">
                 {% if topics_count > 0 %}
-                    <h1>{{ system.snippets.welcome }}</h1>
-                    <h4>{{ system.snippets.welcome_message }}</h4>
+                  {% if system.snippets.welcome_message != null && system.snippets.welcome_message != '' %}
+                      <h1>{{system.snippets.welcome}}</h1>
+                      <h4>{{system.snippets.welcome_message}}</h4>
+                  {% else %}
+                    <h1>Welcome</h1>
+                    <h4>A place where you can easily find solutions and ask questions</h4>
+                  {% endif %}
                 {% else %}
                    <h1>{{system.snippets.no_topics_avail}}</h1>
                 {% endif %}
