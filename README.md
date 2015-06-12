@@ -7,7 +7,11 @@
 1. Grid - Standard Default View
 2. Topics - Displays topics only as buttons and article count.
 
-##Other Options
+###Other Options
+####DemoMode:
+Ture/False: enables demo mode which defaults to already uploaded topic images
+####CustomThemeOptions:
+Ture/False: enables custom theme options (color selection etc) located in the header
 ####SkipPreCreate:
 Ture/False: enables skip precreate pages site wide (email,chat, question)
 ####MyCasesSort:
