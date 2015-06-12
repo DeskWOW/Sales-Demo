@@ -86,51 +86,300 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 
-
-
-
-<style>
-    {% if desk.page.theme.logo-img != "" %}
-    /* LOGO FUNCTIONALITY */
-      #header h1 a {
-        display: block;
-        background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
-        background-size: {{ desk.page.theme.logo-img-width | divided_by:2 }}px {{ desk.page.theme.logo-img-height | divided_by:2}}px;
-        height: {{desk.page.theme.logo-img-height | divided_by:2}}px;
-        width: {{desk.page.theme.logo-img-width | divided_by:2}}px;
-        padding-left: 0px;
-        line-height: {{desk.page.theme.logo-img-height | divided_by:2 }}px;
-        text-indent: -9999px;
-      }
-
-      #mobile-menu .brand .logo{
-        text-indent: -9999px;
-        display: block;
-        margin: 10px auto;
-        background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
-        padding-top: {{desk.page.theme.logo-img-height | plus: 15 }}px;
-        height: {{desk.page.theme.logo-img-height | divided_by: 1}}px;
-        width: {{ desk.page.theme.logo-img-width | divided_by: 1}}px;
-      }
-      /* ADJUST MENU FOR SUPER WIDE LOGO/BANNER IMAGE */
-        @media only screen and (max-width : 767px) {
-          #header h1 a {
-            display: block;
-            background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
-            background-size: {{ desk.page.theme.logo-img-width | divided_by:4 }}px {{ desk.page.theme.logo-img-height | divided_by:4}}px;
-            height: 50px;
-            width: {{desk.page.theme.logo-img-width | divided_by:4}}px;
-            padding-left: 0px;
-            line-height: 50px;
-            text-indent: -9999px;
-          }
+{% assign CustomThemeOptions = false %} 
+  <style>
+      {% if desk.page.theme.logo-img != "" %}
+      /* LOGO FUNCTIONALITY */
+        #header h1 a {
+          display: block;
+          background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
+          background-size: {{ desk.page.theme.logo-img-width | divided_by:2 }}px {{ desk.page.theme.logo-img-height | divided_by:2}}px;
+          height: {{desk.page.theme.logo-img-height | divided_by:2}}px;
+          width: {{desk.page.theme.logo-img-width | divided_by:2}}px;
+          padding-left: 0px;
+          line-height: {{desk.page.theme.logo-img-height | divided_by:2 }}px;
+          text-indent: -9999px;
         }
-    {% endif %}
-    #header {
-      background: url({{ desk.current_brand.logo }}) no-repeat;
-      background-size: cover;
-      background-position: center center;
-    }
 
-    {{ desk.page.theme.custom_css }}
-</style>
+        #mobile-menu .brand .logo{
+          text-indent: -9999px;
+          display: block;
+          margin: 10px auto;
+          background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
+          padding-top: {{desk.page.theme.logo-img-height | plus: 15 }}px;
+          height: {{desk.page.theme.logo-img-height | divided_by: 1}}px;
+          width: {{ desk.page.theme.logo-img-width | divided_by: 1}}px;
+        }
+        /* ADJUST MENU FOR SUPER WIDE LOGO/BANNER IMAGE */
+          @media only screen and (max-width : 767px) {
+            #header h1 a {
+              display: block;
+              background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
+              background-size: {{ desk.page.theme.logo-img-width | divided_by:4 }}px {{ desk.page.theme.logo-img-height | divided_by:4}}px;
+              height: 50px;
+              width: {{desk.page.theme.logo-img-width | divided_by:4}}px;
+              padding-left: 0px;
+              line-height: 50px;
+              text-indent: -9999px;
+            }
+          }
+      {% else %}
+        #header h1 a {
+          display: block;
+          background: url('//desk-customers.s3.amazonaws.com/sedemo/css/img/logo.png') no-repeat scroll 0 center transparent;
+          background-size: 125px 35px;
+          height: 35px;
+          width: 125px;
+          padding-left: 0px;
+          line-height: 35px;
+          text-indent: -9999px;
+        }
+
+        #mobile-menu .brand .logo{
+          text-indent: -9999px;
+          display: block;
+          margin: 10px auto;
+          background: url('//desk-customers.s3.amazonaws.com/sedemo/css/img/logo.png') no-repeat scroll 0 center transparent;
+          padding-top: 85px;
+          height: 70px;
+          width: 250px;
+        }
+        /* ADJUST MENU FOR SUPER WIDE LOGO/BANNER IMAGE */
+          @media only screen and (max-width : 767px) {
+            #header h1 a {
+              display: block;
+              background: url('//desk-customers.s3.amazonaws.com/sedemo/css/img/logo.png') no-repeat scroll 0 center transparent;
+              background-size: 62px 17px;
+              height: 50px;
+              width: 62px;
+              padding-left: 0px;
+              line-height: 50px;
+              text-indent: -9999px;
+            }
+          }
+      {% endif %}
+      {% if desk.current_brand.logo != "" %}
+        #header {
+          background: url({{ desk.current_brand.logo }}) no-repeat;
+          background-size: cover;
+          background-position: center center;
+        }
+      {% else %}
+        #header {
+          background: url(//desk-customers.s3.amazonaws.com/sedemo/css/img/header.jpg);
+        }
+      {% endif %}
+
+
+{% if CustomThemeOptions == true %}
+
+      /* HEADER TEXT/LINKS */
+        #header h1 a,
+        #header ul.nav.nav-pills li a,
+        #header ul.nav.nav-pills li p,
+        #header .langslct,
+        #header .langslct > .langslctInner{
+          border-color: {{desk.page.theme.hdr-text-color}};
+          color: {{desk.page.theme.hdr-text-color}} ;
+        }
+      /* HEADER HOVERS */
+        #header ul.nav.nav-pills li:hover a,
+        #header .langslct:hover,
+        #header .langslct.langslctHover,
+        #header .langslct.langslctOpen,
+        #header .langslct.langslctFocus {
+          border-color: {{desk.page.theme.hdr-text-color}}!important;
+          color: {{desk.page.theme.hdr-text-color}}!important;
+        }
+      /* MOBILE  HEADER*/
+        #mobileHeader h1 a,
+        #mobile-menu input#q2,
+        #mobile-menu .search button {
+          color: {{desk.page.theme.hdr-text-color}}!important;
+        }
+        #mobileHeader .menu-button span {
+          background: {{desk.page.theme.hdr-text-color}};
+        }
+      /* HEADER COLORS/FACES */
+        body, p, html, h1, h2, h3, h4, h5, h6,
+        #content .container.index .desk-topic h3 a,
+        #content .container.index .desk-qna h3 a,
+        #content .container.index .get-sat h4 a,
+        #content .container.topic .body .qna h3 a,
+        #content .container.topic .body .article h3 a{
+          {% if desk.page.theme.header-font != "" %}
+            font-family: {{desk.page.theme.header-font}};
+          {% endif %}
+          color: {{desk.page.theme.default-text-color}};
+        }
+      /* DEFAULT CONTENT COLORS/FACES */
+        body,p {
+          line-height: 1.64;
+          font-size: {{desk.page.theme.content-font-size }}px;
+        }
+        body, p, blockquote, ul, ol, li,
+        .breadcrumb > .active,
+        .myportal.index .body table tbody,
+        #content .container.index .desk-topic ul li a,
+        #content .container.index .desk-qna ul li a,
+        #content .container.index .get-sat ul li a {
+          color: {{desk.page.theme.content-text-color}};
+          {% if desk.page.theme.default-font != "" %}
+             font-family: {{desk.page.theme.default-font}};
+          {% endif %}
+        }
+      /* BUTTON COLORS */
+        .button.primary, #search #support-search-submit,
+        .myportal.index .header ul.case-menu li.new a,
+        .myportal.case .status  button,
+        .myportal.case .status  input[type="submit"],
+        .new_customer_contact_email button,
+        #content .container.topic .header .switch .btn.active,
+        #content .container.topic .header .switch .btn:hover,
+        .input-button > input,
+        .attachments a.add_attachment,
+        .desk_file_upload input[type=button],
+        .input-button > input,
+        .input-button > input.btn.btn-submit,
+        .btn.btn-submit,
+        #rowbar ul li a,
+        .label,
+        .topics-only a.btn-primary {
+          background: {{desk.page.theme.btn-background-color}};
+          border-color: {{desk.page.theme.btn-background-color}};
+          color: {{desk.page.theme.btn-text-color}};
+        }
+      /* BUTTN HOVERS */
+        .button.primary:hover, #search #support-search-submit:hover,
+        .myportal.index .header ul.case-menu li.new a:hover,
+        .myportal.case .status  button:hover,
+        .myportal.case .status  input[type="submit"]:hover,
+        .new_customer_contact_email button:hover,
+        #content .container.topic .header .switch .btn.active,
+        #content .container.topic .header .switch .btn:hover,
+        .input-button > input:hover,
+        .attachments a.add_attachment:hover,
+        .desk_file_upload input[type=button]:hover,
+        .input-button > input:hover,
+        .input-button > input.btn.btn-submit:hover,
+        .btn.btn-submit:hover,
+        #rowbar ul li a:hover,
+        .topics-only a.btn-primary:hover
+        #content .container.topic .header .switch .btn:hover{
+          background: {{desk.page.theme.btn-hover-color}};
+          border-color: {{desk.page.theme.btn-hover-color}};
+          color: {{desk.page.theme.btn-text-color}};
+        }
+      /* DEFAULT PILL STYLE BUTTONS */
+        .login a.btn,
+        .input-button > input.btn,
+        a.btn.btn-pill{
+          background: none;
+          border: 2px solid {{desk.page.theme.btn-background-color}};
+          color: {{desk.page.theme.btn-background-color}};
+        }
+        a.btn.btn-pill span {
+          color: {{desk.page.theme.btn-background-color}};
+          border-right: 2px solid {{desk.page.theme.btn-background-color}};
+        }
+        .alternatelogins #facebook,
+        .alternatelogins #twitter {
+          border: 2px solid {{desk.page.theme.btn-background-color}};
+        }
+        .login a.btn:hover,
+        .alternatelogins #facebook:hover,
+        .alternatelogins #twitter:hover,
+        .input-button > input.btn:hover,
+        #content a.btn.btn-pill:hover{
+          background: {{desk.page.theme.btn-background-color}};
+          color: {{desk.page.theme.btn-text-color}};
+          border-color: {{desk.page.theme.btn-background-color}};
+        }
+        a.btn.btn-pill:hover,
+        #content a.btn.btn-pill:hover,
+        #content a.btn.btn-pill span:hover,
+        #content a.btn.btn-pill:hover span{
+          color: {{desk.page.theme.btn-text-color}};
+          border-color: {{desk.page.theme.btn-text-color}};
+        }
+        #content a.btn.btn-pill:hover {
+          border-color: {{desk.page.theme.btn-background-color}};
+        }
+      /* QUESTION/ARTICLE SWITCH */
+        #content .container.topic .header .switch .btn {
+          background: none;
+          border-color: {{desk.page.theme.btn-background-color}} ;
+          color:  {{desk.page.theme.btn-background-color}} ;
+        }
+        #content .container.topic .header .switch .btn:hover,
+        #content .container.topic .header .switch .btn.active{
+          background: {{desk.page.theme.btn-background-color}};
+          border-color: {{desk.page.theme.btn-background-color}};
+          color: {{desk.page.theme.btn-text-color}};
+        }
+      /* LINKS COLOR */
+        a,
+        #breadcrumbs ol.breadcrumb li a,
+        .myportal.index .body table tbody tr a,
+        div.myportal.account .myaccount-form  div[id^="email_"] .verified input,
+        #add_facebook input.btn,
+        #add_twitter input.btn,
+        .container.pre-create .panel-body ul li h4 a span.highlight,
+        .container.pre-create .panel-body ul li a,
+        .container.pre-create .panel-body ul li h4,
+        div.options ul li a,
+        #sidebar > ul > li > a,
+        .gs-content ul > li > div,
+        #sidebar .autosuggest > ul > li > a > span,
+        #footer,
+        #footer .container p,
+        #footer .container a span,
+        #mobile-menu .mobile-suggest ul.results li a i {
+          color: {{desk.page.theme.hyperlink-color}};
+        }
+      /* PAGINATION */
+        .pagination>li>a, .pagination>li>span {
+          color: {{desk.page.theme.btn-background-color}};
+        }
+        .pagination>li>a:hover,
+        .pagination>li>span:hover,
+        .pagination>li>a:focus,
+        .pagination>li>span:focus {
+          color: {{desk.page.theme.btn-background-color}};
+        }
+        .pagination>.active>a,
+        .pagination>.active>span,
+        .pagination>.active>a:hover,
+        .pagination>.active>span:hover,
+        .pagination>.active>a:focus,
+        .pagination>.active>span:focus{
+          background: {{desk.page.theme.btn-background-color}};
+          border-color: {{desk.page.theme.btn-background-color}};
+          color: {{desk.page.theme.btn-text-color}};
+        }
+      /* SEARCH BAR -- Uses Old Title Background */
+        #search {background: {{desk.page.theme.title-background-color}};}
+      /* AUTOCOLETE */
+        .ui-menu {
+          background: {{desk.page.theme.autocomplete-background-color}};
+        }
+        ul.ui-menu li.ui-menu-item a{
+          font-size: {{desk.page.theme.autocomplete-font-size }}px;
+          color: {{ desk.page.theme.autocomplete-text-color }};
+          font-size: {{desk.page.theme.autocomplete-font-size}}px;
+        }
+        ul.ui-menu li.ui-menu-item:hover{
+          background-color: {{desk.page.theme.autocomplete-text-color}};
+          color: {{desk.page.theme.autocomplete-background-color}};
+        }
+        ul.ui-menu li.ui-menu-item:hover a span {
+          color: {{desk.page.theme.autocomplete-background-color}};
+        }
+       ul.ui-menu li.ui-menu-item .article-autocomplete-body {
+          font-size: {{desk.page.theme.autocomplete-font-size | minus: 4}}px;
+          color: {{desk.page.theme.autocomplete-snippet-color}};
+        }
+      {{ desk.page.theme.custom_css }}
+    {% endif %}
+  </style>
+
