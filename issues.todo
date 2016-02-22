@@ -1,0 +1,10 @@
+
+Thanks again for helping out with the support center theme changes.  I think we are going to stick with the Cirrus demo theme for the short term as it mirrors the Napili theme used in Community demos.  That said, here are the few items that we need some help cleaning up: 
+ 
+☐  I Remove Multi-brand logic (e.g. no need to pull in "brand logo" as the header image)
+☐  Add logo using the web theme editor
+☐  Link colors to web theme color options as much as possible
+☐  Remo "demo-mode" setting - don't think we really have a need for this now
+☐  By default, header background color should be the background of the header
+☐  Field in the "customize content" section of the theme should allow us to insert a hosted header background image
+☐  Multi-lingual + Private Portal being turned on causes alignment issues: http://take.ms/MleEO

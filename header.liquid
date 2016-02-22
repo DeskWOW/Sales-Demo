@@ -85,11 +85,10 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
-
+<!-- {{desk.page.theme.logo-img}} -->
 {% assign CustomThemeOptions = false %} 
   <style>
-      {% if desk.page.theme.logo-img != "" %}
-      /* LOGO FUNCTIONALITY */
+
         #header h1 a {
           display: block;
           background: url('{{desk.page.theme.logo-img}}') no-repeat scroll 0 center transparent;
@@ -123,7 +122,22 @@
               text-indent: -9999px;
             }
           }
+
+
+      {% if desk.current_brand.logo != "" %}
+        #header {
+          background: url({{ desk.current_brand.logo }}) no-repeat;
+          background-size: cover;
+          background-position: center center;
+        }
       {% else %}
+        #header {
+          background: url(//desk-customers.s3.amazonaws.com/sedemo/css/img/header.jpg);
+        }
+      {% endif %}
+
+
+{% if CustomThemeOptions == true %}
         #header h1 a {
           display: block;
           background: url('//desk-customers.s3.amazonaws.com/sedemo/css/img/logo.png') no-repeat scroll 0 center transparent;
@@ -145,34 +159,18 @@
           width: 250px;
         }
         /* ADJUST MENU FOR SUPER WIDE LOGO/BANNER IMAGE */
-          @media only screen and (max-width : 767px) {
-            #header h1 a {
-              display: block;
-              background: url('//desk-customers.s3.amazonaws.com/sedemo/css/img/logo.png') no-repeat scroll 0 center transparent;
-              background-size: 62px 17px;
-              height: 50px;
-              width: 62px;
-              padding-left: 0px;
-              line-height: 50px;
-              text-indent: -9999px;
-            }
+        @media only screen and (max-width : 767px) {
+          #header h1 a {
+            display: block;
+            background: url('//desk-customers.s3.amazonaws.com/sedemo/css/img/logo.png') no-repeat scroll 0 center transparent;
+            background-size: 62px 17px;
+            height: 50px;
+            width: 62px;
+            padding-left: 0px;
+            line-height: 50px;
+            text-indent: -9999px;
           }
-      {% endif %}
-      {% if desk.current_brand.logo != "" %}
-        #header {
-          background: url({{ desk.current_brand.logo }}) no-repeat;
-          background-size: cover;
-          background-position: center center;
         }
-      {% else %}
-        #header {
-          background: url(//desk-customers.s3.amazonaws.com/sedemo/css/img/header.jpg);
-        }
-      {% endif %}
-
-
-{% if CustomThemeOptions == true %}
-
       /* HEADER TEXT/LINKS */
         #header h1 a,
         #header ul.nav.nav-pills li a,
@@ -363,6 +361,7 @@
         .ui-menu {
           background: {{desk.page.theme.autocomplete-background-color}};
         }
+        
         ul.ui-menu li.ui-menu-item a{
           font-size: {{desk.page.theme.autocomplete-font-size }}px;
           color: {{ desk.page.theme.autocomplete-text-color }};

@@ -1,14 +1,15 @@
 <!-- THEME OPTIONS -->
-{% assign MyCasesSort = false %} <!-- All cases load on my case index page and our sortable -->
-{% assign IndexLayout = "Topics" %} <!-- Layout Functionality: Topics, Grid, List -->
-{% assign SkipPreCreate = false %} <!-- Enable skip precreate site wide (email,chat, question) -->
+{% assign MyCasesSort = true %} <!-- All cases load on my case index page and our sortable -->
+{% assign IndexLayout = "Topics" %} <!-- Layout Functionality: Topics, Grid -->
+{% assign SkipPreCreate = true %} <!-- Enable skip precreate site wide (email,chat, question) -->
+{% assign DemoMode = true %} <!-- Multibrand Article suggestion on email/chat/question forms -->
 
 <!-- MULTIBRAND OPTIONS -->
 {% assign MBSearchPage = false %} <!--Enables multibrand search page - all results/brands on one page -->
 {% assign MBSearchExcludeQuestions = false %} <!-- exclude questions, should only enable if MBSearchPage = true -->
 {% assign MBSearchSuggest = false %} <!-- Multibrand search autocomplete similar to desk's support site -->
 {% assign MBArticleSuggest = false %} <!-- Multibrand Article suggestion on email/chat/question forms -->
-{% assign DemoMode = true %} <!-- Multibrand Article suggestion on email/chat/question forms -->
+
 
 
 <!-- LOGO WIDTH TESTING // DONT REMOVE-->
@@ -67,7 +68,7 @@
 
 {% capture sidebar_suggest %}
     <!-- BEGIN AUTO SUGGEST SIDEBAR -->
-    <div id="sidebar" class="sidebar suggest col-md-4 {% if desk.page.theme.layout != 'left' %}left col-md-pull-8 {% endif %}">
+    <div id="sidebar" class="sidebar suggest col-md-4">
       <div id="common">
         {% if page == "question_new" %}
           <h2>{{ system.snippets.related_questions }}</h2>
@@ -125,13 +126,6 @@
           </div>
           <div class="col-md-2 col-xs-2">
             <ul class="menu">
-              {% if current_user and current_user.is_guest == true %}
-               {% if langs_list %}
-                 <li>
-                      {{langs_list}}
-                 </li>
-               {% endif %}
-              {% endif %}
               {% if site.portal_authentication_enabled_config %}
                 <!-- Guest -->
                 {% if current_user and current_user.is_guest == true  and page != "login" %}
@@ -245,7 +239,13 @@
                   {% elsif page == "authentication_verification" %}
                       <li><a href='{{desk.system.links.home}}'>{{system.snippets.home}}</a> &rsaquo; {{desk.system.snippets.auth_verification_title}}</li>
                   {% endif %}
+
               </ol>
+              {% if langs_list %}
+                 <div class="lang">
+                    {{langs_list}}
+                 </div>
+              {% endif %}
             </div>
           </div>
         </div>
